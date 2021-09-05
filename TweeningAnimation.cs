@@ -3,7 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace hjijijing.Tweening {
+namespace hjijijing.Tweening
+{
 
     public class TweeningAnimation
     {
@@ -20,16 +21,20 @@ namespace hjijijing.Tweening {
 
         public ITweeningAction latestBuildAction = null;
 
-        public TweeningAnimation(MonoBehaviour source, GameObject gameObject)
+        public TweeningAnimation(MonoBehaviour source, GameObject gameObject) : this(source)
+        {
+            this.gameObject = gameObject;
+        }
+
+        public TweeningAnimation(MonoBehaviour source)
         {
             this.source = source;
-            this.gameObject = gameObject;
         }
 
 
         public void Start()
         {
-            if(builder.Count != 0)
+            if (builder.Count != 0)
             {
                 commitBuilder();
             }
@@ -49,10 +54,10 @@ namespace hjijijing.Tweening {
 
             List<ITweeningAction> actionQueue = actionQueues[queueNumber];
 
-            foreach(ITweeningAction action in actionQueue)
+            foreach (ITweeningAction action in actionQueue)
             {
                 action.doAction();
-                if(action is ITweener)
+                if (action is ITweener)
                 {
                     ongoingTweens.Add((ITweener)action);
                 }
@@ -71,7 +76,7 @@ namespace hjijijing.Tweening {
 
         public void Stop()
         {
-            foreach(ITweener tweener in ongoingTweens)
+            foreach (ITweener tweener in ongoingTweens)
             {
                 tweener.Stop();
             }
@@ -80,11 +85,11 @@ namespace hjijijing.Tweening {
 
         public void forceFinish()
         {
-            for(int i = 0; i < actionQueues.Count; i++)
+            for (int i = 0; i < actionQueues.Count; i++)
             {
                 List<ITweeningAction> actionQueue = actionQueues[i];
 
-                for(int j = 0; j < actionQueue.Count; j++)
+                for (int j = 0; j < actionQueue.Count; j++)
                 {
                     ITweeningAction action = actionQueue[j];
                     if (!(action is ITweener)) continue;
@@ -131,9 +136,9 @@ namespace hjijijing.Tweening {
 
         public TweeningAnimation SetEasingAll(Func<float, float> easing)
         {
-            foreach(List<ITweeningAction> l in actionQueues)
+            foreach (List<ITweeningAction> l in actionQueues)
             {
-                foreach(ITweeningAction a in l)
+                foreach (ITweeningAction a in l)
                 {
                     if (!(a is ITweener)) continue;
                     ((ITweener)a).easing = easing;
@@ -141,7 +146,7 @@ namespace hjijijing.Tweening {
             }
 
 
-            foreach(ITweeningAction a in builder)
+            foreach (ITweeningAction a in builder)
             {
                 if (!(a is ITweener)) continue;
                 ((ITweener)a).easing = easing;
@@ -149,18 +154,35 @@ namespace hjijijing.Tweening {
 
             return this;
         }
+        #region Tweeners
 
         public TweeningAnimation move(Vector3 targetPosition, float duration)
         {
+            return move(gameObject, targetPosition, duration);
+        }
+
+        public TweeningAnimation move(GameObject gameObject, Vector3 targetPosition, float duration)
+        {
+            if (gameObject == null) return this;
             PositionTweener action = new PositionTweener(tweenDone, source, gameObject, duration, targetPosition);
             latestBuildAction = action;
+
+
 
             builder.Add(action);
             return this;
         }
 
+
+
         public TweeningAnimation colorMesh(Color targetColor, float duration)
         {
+            return colorMesh(gameObject, targetColor, duration);
+        }
+
+        public TweeningAnimation colorMesh(GameObject gameObject, Color targetColor, float duration)
+        {
+            if (gameObject == null) return this;
             MeshColorTweener action = new MeshColorTweener(tweenDone, source, gameObject, duration, targetColor);
             latestBuildAction = action;
 
@@ -170,6 +192,12 @@ namespace hjijijing.Tweening {
 
         public TweeningAnimation rotate(Quaternion targetRotation, float duration)
         {
+            return rotate(gameObject, targetRotation, duration);
+        }
+
+        public TweeningAnimation rotate(GameObject gameObject, Quaternion targetRotation, float duration)
+        {
+            if (gameObject == null) return this;
             RotationTweener action = new RotationTweener(tweenDone, source, gameObject, duration, targetRotation);
             latestBuildAction = action;
 
@@ -179,8 +207,16 @@ namespace hjijijing.Tweening {
 
         public TweeningAnimation scale(Vector3 targetScale, float duration)
         {
+            return scale(gameObject, targetScale, duration);
+        }
+
+        public TweeningAnimation scale(GameObject gameObject, Vector3 targetScale, float duration)
+        {
+            if (gameObject == null) return this;
             ScaleTweener action = new ScaleTweener(tweenDone, source, gameObject, duration, targetScale);
             latestBuildAction = action;
+
+
 
             builder.Add(action);
             return this;
@@ -266,7 +302,7 @@ namespace hjijijing.Tweening {
             return this;
         }
 
-
+        #endregion
 
     }
 
