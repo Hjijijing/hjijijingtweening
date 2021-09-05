@@ -1,3 +1,5 @@
+# 1.0.4b - 05-09-2021
+Forgot to change package.json version in update 1.0.4 from "1.0.3" to "1.0.4" so that has been done now.
 # 1.0.4 - 05-09-2021
 ### Added:
 - Easing.randomEasing(min,max) will return an easing function that returns random values between min and max. The function will always return 0 when the input is 0 and 1 when the input is 1.
