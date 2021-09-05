@@ -330,7 +330,7 @@ namespace hjijijing.Tweening
         /// <returns></returns>
         public TweeningAnimation move(Vector3 targetPosition, float duration, float startDelay = 0f, float endDelay = 0f)
         {
-            return move(gameObject, targetPosition, duration);
+            return move(gameObject, targetPosition, duration, startDelay, endDelay);
         }
 
         /// <summary>
@@ -365,7 +365,7 @@ namespace hjijijing.Tweening
         /// <returns></returns>
         public TweeningAnimation colorMesh(Color targetColor, float duration, float startDelay = 0f, float endDelay = 0f)
         {
-            return colorMesh(gameObject, targetColor, duration);
+            return colorMesh(gameObject, targetColor, duration, startDelay, endDelay);
         }
 
         /// <summary>
@@ -397,7 +397,7 @@ namespace hjijijing.Tweening
         /// <returns></returns>
         public TweeningAnimation rotate(Quaternion targetRotation, float duration, float startDelay = 0f, float endDelay = 0f)
         {
-            return rotate(gameObject, targetRotation, duration);
+            return rotate(gameObject, targetRotation, duration, startDelay, endDelay);
         }
 
         /// <summary>
@@ -429,7 +429,7 @@ namespace hjijijing.Tweening
         /// <returns></returns>
         public TweeningAnimation scale(Vector3 targetScale, float duration, float startDelay = 0f, float endDelay = 0f)
         {
-            return scale(gameObject, targetScale, duration);
+            return scale(gameObject, targetScale, duration, startDelay, endDelay);
         }
 
         /// <summary>

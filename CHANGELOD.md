@@ -1,3 +1,6 @@
+# 1.0.7c - 05-09-2021
+### Fixed:
+- Fixed another problem where start and end delays where not set.
 # 1.0.7b - 05-09-2021
 ### Fixed:
 - Fixed it for real this time. Maybe?
