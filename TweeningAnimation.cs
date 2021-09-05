@@ -110,7 +110,8 @@ namespace hjijijing.Tweening
         /// </summary>
         protected void commitBuilder()
         {
-            actionQueues.Add(builder);
+            if (builder.Count != 0)
+                actionQueues.Add(builder);
             builder = new List<ITweeningAction>();
         }
 
@@ -214,10 +215,18 @@ namespace hjijijing.Tweening
         /// <returns></returns>
         public TweeningAnimation then(float waitForSeconds)
         {
-            then().Wait(waitForSeconds).then();
-            return this;
+            return then().Wait(waitForSeconds).then();
         }
 
+        /// <summary>
+        /// Commits the current builder and starts a new one with the given marker.
+        /// </summary>
+        /// <param name="marker">The marker to add</param>
+        /// <returns></returns>
+        public TweeningAnimation then(string marker)
+        {
+            return then().Marker(marker);
+        }
 
         /// <summary>
         /// Sets the default easing to use for all tweens added after this function is called.
@@ -291,13 +300,22 @@ namespace hjijijing.Tweening
         }
 
 
-        protected void AddAction(ITweeningAction action)
+        protected void AddActionToBuilder(ITweeningAction action)
         {
             if (action is ITweener)
             {
                 ((ITweener)action).easing = easing;
             }
             builder.Add(action);
+        }
+
+        protected void InsertActionToBuilder(ITweeningAction action, int index)
+        {
+            if (action is ITweener)
+            {
+                ((ITweener)action).easing = easing;
+            }
+            builder.Insert(0, action);
         }
 
         #region Tweeners
@@ -332,7 +350,7 @@ namespace hjijijing.Tweening
 
 
 
-            AddAction(action);
+            AddActionToBuilder(action);
             return this;
         }
 
@@ -365,7 +383,7 @@ namespace hjijijing.Tweening
             MeshColorTweener action = new MeshColorTweener(tweenDone, source, gameObject, targetColor, duration, startDelay, endDelay);
             latestBuildAction = action;
 
-            AddAction(action);
+            AddActionToBuilder(action);
             return this;
         }
 
@@ -397,7 +415,7 @@ namespace hjijijing.Tweening
             RotationTweener action = new RotationTweener(tweenDone, source, gameObject, targetRotation, duration, startDelay, endDelay);
             latestBuildAction = action;
 
-            AddAction(action);
+            AddActionToBuilder(action);
             return this;
         }
 
@@ -431,7 +449,7 @@ namespace hjijijing.Tweening
 
 
 
-            AddAction(action);
+            AddActionToBuilder(action);
             return this;
         }
 
@@ -450,7 +468,7 @@ namespace hjijijing.Tweening
             Vector3TweeningActionCallback action = new Vector3TweeningActionCallback(tweenDone, source, gameObject, start, end, callback, duration, startDelay, endDelay);
             latestBuildAction = action;
 
-            AddAction(action);
+            AddActionToBuilder(action);
             return this;
         }
 
@@ -469,7 +487,7 @@ namespace hjijijing.Tweening
             Vector2TweeningActionCallback action = new Vector2TweeningActionCallback(tweenDone, source, gameObject, start, end, callback, duration, startDelay, endDelay);
             latestBuildAction = action;
 
-            AddAction(action);
+            AddActionToBuilder(action);
             return this;
         }
 
@@ -488,7 +506,7 @@ namespace hjijijing.Tweening
             FloatTweeningActionCallback action = new FloatTweeningActionCallback(tweenDone, source, gameObject, start, end, callback, duration, startDelay, endDelay);
             latestBuildAction = action;
 
-            AddAction(action);
+            AddActionToBuilder(action);
             return this;
         }
 
@@ -507,7 +525,7 @@ namespace hjijijing.Tweening
             IntTweeningActionCallback action = new IntTweeningActionCallback(tweenDone, source, gameObject, start, end, callback, duration, startDelay, endDelay);
             latestBuildAction = action;
 
-            AddAction(action);
+            AddActionToBuilder(action);
             return this;
         }
 
@@ -526,7 +544,7 @@ namespace hjijijing.Tweening
             QuaternionTweeningActionCallback action = new QuaternionTweeningActionCallback(tweenDone, source, gameObject, start, end, callback, duration, startDelay, endDelay);
             latestBuildAction = action;
 
-            AddAction(action);
+            AddActionToBuilder(action);
             return this;
         }
 
@@ -546,7 +564,7 @@ namespace hjijijing.Tweening
             latestBuildAction = action;
 
 
-            AddAction(action);
+            AddActionToBuilder(action);
             return this;
         }
 
@@ -565,7 +583,7 @@ namespace hjijijing.Tweening
             ColorTweeningActionCallback action = new ColorTweeningActionCallback(tweenDone, source, gameObject, start, end, callback, duration, startDelay, endDelay);
             latestBuildAction = action;
 
-            AddAction(action);
+            AddActionToBuilder(action);
             return this;
         }
 
@@ -580,7 +598,7 @@ namespace hjijijing.Tweening
             CallBackIntermediaryAction tweeningaction = new CallBackIntermediaryAction(action);
             latestBuildAction = tweeningaction;
 
-            AddAction(tweeningaction);
+            AddActionToBuilder(tweeningaction);
             return this;
         }
 
@@ -595,11 +613,133 @@ namespace hjijijing.Tweening
             WaitForTime action = new WaitForTime(tweenDone, source, gameObject, duration);
             latestBuildAction = action;
 
-            AddAction(action);
+            AddActionToBuilder(action);
             then();
 
             return this;
         }
+
+        #endregion
+
+
+        #region Looping and reversing and such
+
+        #region Markers
+        /// <summary>
+        /// Adds a marker to the current builder
+        /// </summary>
+        /// <param name="marker">The marker to add</param>
+        /// <returns></returns>
+        public TweeningAnimation Marker(string marker)
+        {
+            MarkerAction markerAction = new MarkerAction(marker);
+            latestBuildAction = markerAction;
+            InsertActionToBuilder(markerAction, 0);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Checks if the specified queue has the specified marker.
+        /// </summary>
+        /// <param name="marker">The marker to check for</param>
+        /// <param name="queue">The queue to check in</param>
+        /// <returns>True if the queue contains the marker, otherwise false</returns>
+        public bool HasMarker(string marker, List<ITweeningAction> queue)
+        {
+            foreach(ITweeningAction action in queue)
+            {
+                if (!(action is MarkerAction)) break;
+                if (((MarkerAction)action).marker == marker) return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Checks if the action queue with the specified queue number has the specified marker 
+        /// </summary>
+        /// <param name="marker">The marker to check for</param>
+        /// <param name="queueNumber">The queue to check in</param>
+        /// <returns>True if the queue contains the marker, otherwise false</returns>
+        public bool HasMarker(string marker, int queueNumber)
+        {
+            if (queueNumber >= actionQueues.Count) return false;
+            return HasMarker(marker, actionQueues[queueNumber]);
+        }
+
+        /// <summary>
+        /// Checks if builder has the specified marker 
+        /// </summary>
+        /// <param name="marker">The marker to check for</param>
+        /// <returns>True if the builder contains the marker, otherwise false</returns>
+        public bool BuilderHasMarker(string marker)
+        {
+            return HasMarker(marker, builder);
+        }
+        #endregion
+
+        /// <summary>
+        /// Adds the reverse of all currently added actions to the queue placed where this is called
+        /// </summary>
+        public void Reverse()
+        {
+            then();
+            Marker("_reverse");
+            call(AddReverse());
+            then();
+        }
+
+        protected Action AddReverse()
+        {
+            int reverseQueueNumber = actionQueues.Count;
+
+            return () => {
+                if (!HasMarker("_reverse", queueNumber)) return;
+                actionQueues.RemoveAt(reverseQueueNumber);
+
+                for(int i = reverseQueueNumber-1; i > -1; i--)
+                {
+                    List<ITweeningAction> reverseList = new List<ITweeningAction>();
+                    foreach(ITweeningAction action in actionQueues[i])
+                    {
+                        ITweeningAction actionToAdd;
+                        if(action is ITweener)
+                        {
+                            actionToAdd = ((ITweener)action).getReverse();
+                        } else
+                        {
+                            actionToAdd = action;
+                        }
+
+                        reverseList.Add(actionToAdd);
+                    }
+
+                    actionQueues.Insert(reverseQueueNumber, reverseList);
+                }
+            };
+        }
+
+        /// <summary>
+        /// Starts the animation and sets it to loop forever, meaning it will go back to the start of the animation whenever it reaches the end
+        /// </summary>
+        public void Loop()
+        {
+            then();
+            call(SetQueueNumberAction(-1));
+            Start();
+        }
+
+        protected Action SetQueueNumberAction(int number)
+        {
+            return () => { SetQueueNumber(number); };
+        }
+
+        protected void SetQueueNumber(int number)
+        {
+            queueNumber = number;
+        }
+
 
         #endregion
 

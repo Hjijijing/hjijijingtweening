@@ -12,3 +12,7 @@ Hjijijing's Tweening is a simple tweening library for Unity. It allows you to tw
 8. Congratulations, you have now the tweening package. To get started, consider checking out the wikis or documentation*
 
 *: Wikis and documentation is under construction
+
+## Plans for new features
+- Branched Actions: The animation will pick a specific branch based on a boolean condition.
+- Repeating Animations: The animation will repeat a certain number of times.

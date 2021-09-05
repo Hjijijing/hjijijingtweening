@@ -1,3 +1,10 @@
+# 1.0.5 - 05-09-2021
+### Added:
+- Loops: You can now call Loop() instead of Start() to loop an animation infinitely.
+- Markers: You can add markers to a queue. This will be used in the future for jumping between queues and stuff. Markers can be created with Marker(string marker) or with then(string marker).
+- Reversing: You can now reverse queues by calling Reverse(). This will add reversed versions of all of the queues that were added before you called Reverse(). So if you add Move to 1,0,0 from 0,0,0 and then call Reverse(), it will first move to 1,0,0 and then move back to 0,0,0.
+- Added extension methods for the MonoBehavior class so you can now call Tween() on a monobehaviour and it will return a new tweening animation.
+- Updated readme with plans for future features.
 # 1.0.4b - 05-09-2021
 Forgot to change package.json version in update 1.0.4 from "1.0.3" to "1.0.4" so that has been done now.
 # 1.0.4 - 05-09-2021

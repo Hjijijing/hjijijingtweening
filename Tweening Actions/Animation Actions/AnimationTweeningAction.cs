@@ -63,6 +63,11 @@ namespace hjijijing.Tweening
             endValue = temp;
         }
 
+       public ITweeningAction getReverse()
+        {
+            return (AnimationTweeningAction<T>)Activator.CreateInstance(typeof(T), onDone, mono, gameObject, startValue, duration, startDelay, endDelay, endDelay);
+        }
+
         public void doAction()
         {
             coroutine = mono.StartCoroutine(execute(onDone));
@@ -70,17 +75,19 @@ namespace hjijijing.Tweening
 
         public abstract void setStartValue();
 
+
         public abstract void modifyGameObject(float time);
 
         public IEnumerator execute(Action<ITweener> onDone)
         {
+            timeSinceStart = 0f;
             if (startDelay > 0f)
                 yield return new WaitForSeconds(startDelay);
 
 
             setStartValue();
             modifyGameObject(0f);
-            timeSinceStart = 0f;
+
             yield return null;
 
             while ((timeSinceStart += Time.deltaTime) < duration)
