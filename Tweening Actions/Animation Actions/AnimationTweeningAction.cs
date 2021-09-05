@@ -56,6 +56,13 @@ namespace hjijijing.Tweening
             modifyGameObject(0f);
         }
 
+        public void reverse()
+        {
+            T temp = startValue;
+            startValue = endValue;
+            endValue = temp;
+        }
+
         public void doAction()
         {
             coroutine = mono.StartCoroutine(execute(onDone));

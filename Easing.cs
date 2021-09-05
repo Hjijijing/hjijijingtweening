@@ -240,6 +240,10 @@ namespace hjijijing.Tweening
         public static Func<float, float> linear = (t) => t;
 
 
+        public static Func<float, float> randomEasing(float min, float max)
+        {
+            return (t) => { return t == 0f ? 0f : t == 1f ? 1f : UnityEngine.Random.Range(min, max); };
+        }
 
 
     }
