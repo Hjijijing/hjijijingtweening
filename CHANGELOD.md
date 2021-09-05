@@ -1,3 +1,6 @@
+# 1.0.6 - 05-09-2021
+### Fixed:
+- Issue in previous update that caused reverse not to work.
 # 1.0.5 - 05-09-2021
 ### Added:
 - Loops: You can now call Loop() instead of Start() to loop an animation infinitely.

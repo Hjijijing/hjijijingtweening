@@ -65,7 +65,7 @@ namespace hjijijing.Tweening
 
        public ITweeningAction getReverse()
         {
-            return (AnimationTweeningAction<T>)Activator.CreateInstance(typeof(T), onDone, mono, gameObject, startValue, duration, startDelay, endDelay, endDelay);
+            return (AnimationTweeningAction<T>)Activator.CreateInstance(typeof(AnimationTweeningAction<T>), onDone, mono, gameObject, startValue, duration, startDelay, endDelay, endDelay);
         }
 
         public void doAction()
