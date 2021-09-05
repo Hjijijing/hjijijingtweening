@@ -9,7 +9,7 @@ namespace hjijijing.Tweening
     public static class Easing
     {
 
-       
+
         //SINE
 
         public static Func<float, float> easeInSine = (t) =>
@@ -19,7 +19,7 @@ namespace hjijijing.Tweening
 
         public static Func<float, float> easeOutSine = (t) =>
         {
-            return Mathf.Sin((t*Mathf.PI) / 2f);
+            return Mathf.Sin((t * Mathf.PI) / 2f);
         };
 
         public static Func<float, float> easeInOutSine = (t) =>
@@ -31,7 +31,7 @@ namespace hjijijing.Tweening
 
         public static Func<float, float> easeInQuad = (t) =>
         {
-            return t*t;
+            return t * t;
         };
 
         public static Func<float, float> easeOutQuad = (t) =>
@@ -49,7 +49,7 @@ namespace hjijijing.Tweening
 
         public static Func<float, float> easeInCubic = (t) =>
         {
-            return t * t*t;
+            return t * t * t;
         };
 
         public static Func<float, float> easeOutCubic = (t) =>
@@ -110,7 +110,7 @@ namespace hjijijing.Tweening
 
         public static Func<float, float> easeInOutExpo = (t) =>
         {
-            return t == 0f ? 0f : t == 1f  ? 1f  : t < 0.5f ? Mathf.Pow(2f, 20f * t - 10f) / 2f : (2f - Mathf.Pow(2f, -20f * t + 10f)) / 2f;
+            return t == 0f ? 0f : t == 1f ? 1f : t < 0.5f ? Mathf.Pow(2f, 20f * t - 10f) / 2f : (2f - Mathf.Pow(2f, -20f * t + 10f)) / 2f;
         };
 
         //Circ
@@ -240,7 +240,7 @@ namespace hjijijing.Tweening
         public static Func<float, float> linear = (t) => t;
 
 
-       
+
 
     }
 
