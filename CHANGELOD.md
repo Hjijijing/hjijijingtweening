@@ -1,3 +1,7 @@
+# 1.0.7 - 05-09-2021
+### Fixed:
+- Actually fixed the issue now.
+- Removed some unused meta files.
 # 1.0.6 - 05-09-2021
 ### Fixed:
 - Issue in previous update that caused reverse not to work.
