@@ -717,6 +717,8 @@ namespace hjijijing.Tweening
 
                     actionQueues.Insert(reverseQueueNumber, reverseList);
                 }
+
+                SetQueueNumber(queueNumber - 1);
             };
         }
 

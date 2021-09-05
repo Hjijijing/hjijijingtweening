@@ -1,3 +1,6 @@
+# 1.0.8b - 05-09-2021
+### Fixed:
+- Fixed yet another reversing issue. On the initial reversal it skipped the first action due to it having same queuenumber as the reverse action.
 # 1.0.8 - 05-09-2021
 ### Fixed:
 - Reversing now properly reverses. Before it only reversed the targets but not the order of the queues.
