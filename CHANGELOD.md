@@ -1,3 +1,7 @@
+# 1.0.8 - 05-09-2021
+### Fixed:
+- Reversing now properly reverses. Before it only reversed the targets but not the order of the queues.
+- Reverse() now returns the tweening animation, like all other actions.
 # 1.0.7c - 05-09-2021
 ### Fixed:
 - Fixed another problem where start and end delays where not set.

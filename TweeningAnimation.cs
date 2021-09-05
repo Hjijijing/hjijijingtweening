@@ -682,12 +682,12 @@ namespace hjijijing.Tweening
         /// <summary>
         /// Adds the reverse of all currently added actions to the queue placed where this is called
         /// </summary>
-        public void Reverse()
+        public TweeningAnimation Reverse()
         {
             then();
             Marker("_reverse");
             call(AddReverse());
-            then();
+            return then();
         }
 
         protected Action AddReverse()
@@ -698,7 +698,7 @@ namespace hjijijing.Tweening
                 if (!HasMarker("_reverse", queueNumber)) return;
                 actionQueues.RemoveAt(reverseQueueNumber);
 
-                for(int i = reverseQueueNumber-1; i > -1; i--)
+                for(int i = 0; i < reverseQueueNumber; i++)
                 {
                     List<ITweeningAction> reverseList = new List<ITweeningAction>();
                     foreach(ITweeningAction action in actionQueues[i])
