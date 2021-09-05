@@ -1,3 +1,6 @@
+# 1.0.7b - 05-09-2021
+### Fixed:
+- Fixed it for real this time. Maybe?
 # 1.0.7 - 05-09-2021
 ### Fixed:
 - Actually fixed the issue now.

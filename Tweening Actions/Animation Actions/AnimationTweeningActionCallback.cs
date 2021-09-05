@@ -40,6 +40,11 @@ namespace hjijijing.Tweening
         {
             callback?.Invoke(Vector3.LerpUnclamped(startValue, endValue, time));
         }
+
+        public override ITweeningAction getReverse()
+        {
+            return new Vector3TweeningActionCallback(onDone, mono, gameObject, endValue, startValue, callback, duration, startDelay, endDelay);
+        }
     }
 
     public class Vector2TweeningActionCallback : AnimationTweeningActionCallback<Vector2>
@@ -50,6 +55,11 @@ namespace hjijijing.Tweening
         public override void modifyGameObject(float time)
         {
             callback?.Invoke(Vector2.LerpUnclamped(startValue, endValue, time));
+        }
+
+        public override ITweeningAction getReverse()
+        {
+            return new Vector2TweeningActionCallback(onDone, mono, gameObject, endValue, startValue, callback, duration, startDelay, endDelay);
         }
     }
 
@@ -64,6 +74,11 @@ namespace hjijijing.Tweening
             callback?.Invoke(Mathf.LerpUnclamped(startValue, endValue, time));
 
         }
+
+        public override ITweeningAction getReverse()
+        {
+            return new FloatTweeningActionCallback(onDone, mono, gameObject, endValue, startValue, callback, duration, startDelay, endDelay);
+        }
     }
 
     public class ColorTweeningActionCallback : AnimationTweeningActionCallback<Color>
@@ -74,6 +89,11 @@ namespace hjijijing.Tweening
         public override void modifyGameObject(float time)
         {
             callback?.Invoke(Color.LerpUnclamped(startValue, endValue, time));
+        }
+
+        public override ITweeningAction getReverse()
+        {
+            return new ColorTweeningActionCallback(onDone, mono, gameObject, endValue, startValue, callback, duration, startDelay, endDelay);
         }
     }
 
@@ -88,6 +108,11 @@ namespace hjijijing.Tweening
             callback?.Invoke((int)Mathf.LerpUnclamped(startValue, endValue, time));
 
         }
+
+        public override ITweeningAction getReverse()
+        {
+            return new IntTweeningActionCallback(onDone, mono, gameObject, endValue, startValue, callback, duration, startDelay, endDelay);
+        }
     }
 
     public class QuaternionTweeningActionCallback : AnimationTweeningActionCallback<Quaternion>
@@ -99,6 +124,11 @@ namespace hjijijing.Tweening
         {
             callback?.Invoke(Quaternion.LerpUnclamped(startValue, endValue, time));
 
+        }
+
+        public override ITweeningAction getReverse()
+        {
+            return new QuaternionTweeningActionCallback(onDone, mono, gameObject, endValue, startValue, callback, duration, startDelay, endDelay);
         }
     }
 
@@ -115,6 +145,11 @@ namespace hjijijing.Tweening
 
             callback?.Invoke(result);
 
+        }
+
+        public override ITweeningAction getReverse()
+        {
+            return new StringTweeningActionCallback(onDone, mono, gameObject, endValue, startValue, callback, duration, startDelay, endDelay);
         }
     }
 

@@ -63,10 +63,6 @@ namespace hjijijing.Tweening
             endValue = temp;
         }
 
-       public ITweeningAction getReverse()
-        {
-            return (ITweeningAction)Activator.CreateInstance(GetType(), onDone, mono, gameObject, startValue, duration, startDelay, endDelay, endDelay);
-        }
 
         public void doAction()
         {
@@ -102,6 +98,8 @@ namespace hjijijing.Tweening
                 yield return new WaitForSeconds(endDelay);
             onDone?.Invoke(this);
         }
+
+        public abstract ITweeningAction getReverse();
     }
 
 

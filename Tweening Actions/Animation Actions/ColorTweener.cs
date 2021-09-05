@@ -11,6 +11,11 @@ namespace hjijijing.Tweening
 
         public MeshColorTweener(Action<ITweener> onDone, MonoBehaviour mono, GameObject gameObject, Color endValue, float duration, float startDelay = 0f, float endDelay = 0f) : base(onDone, mono, gameObject, endValue, duration, startDelay, endDelay) { }
 
+        public override ITweeningAction getReverse()
+        {
+            return new MeshColorTweener(onDone, mono, gameObject, startValue, duration, startDelay, endDelay);
+        }
+
         public override void modifyGameObject(float time)
         {
             MeshRenderer mr = gameObject.GetComponent<MeshRenderer>();
