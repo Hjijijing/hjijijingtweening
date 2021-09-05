@@ -3,7 +3,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace hjijijing.Tweening {
+namespace hjijijing.Tweening
+{
 
     public abstract class AnimationTweeningAction<T> : ITweeningAction, ITweener
     {
@@ -16,6 +17,8 @@ namespace hjijijing.Tweening {
 
 
         public float duration;
+        public float startDelay = 0f;
+        public float endDelay = 0f;
         public T startValue;
         public T endValue;
 
@@ -23,13 +26,16 @@ namespace hjijijing.Tweening {
 
         protected float timeSinceStart = 0f;
 
-        public AnimationTweeningAction(Action<ITweener> onDone, MonoBehaviour mono, GameObject gameObject, float duration, T endValue)
+
+        public AnimationTweeningAction(Action<ITweener> onDone, MonoBehaviour mono, GameObject gameObject, T endValue, float duration, float startDelay = 0f, float endDelay = 0f)
         {
             this.onDone = onDone;
             this.mono = mono;
             this.duration = duration;
             this.endValue = endValue;
             this.gameObject = gameObject;
+            this.startDelay = startDelay;
+            this.endDelay = endDelay;
         }
 
         public void Stop()
@@ -52,7 +58,6 @@ namespace hjijijing.Tweening {
 
         public void doAction()
         {
-            setStartValue();
             coroutine = mono.StartCoroutine(execute(onDone));
         }
 
@@ -62,17 +67,25 @@ namespace hjijijing.Tweening {
 
         public IEnumerator execute(Action<ITweener> onDone)
         {
+            if (startDelay > 0f)
+                yield return new WaitForSeconds(startDelay);
+
+
+            setStartValue();
             modifyGameObject(0f);
             timeSinceStart = 0f;
             yield return null;
 
-            while((timeSinceStart += Time.deltaTime) < duration)
+            while ((timeSinceStart += Time.deltaTime) < duration)
             {
-                modifyGameObject(easing(timeSinceStart / duration));
+                modifyGameObject(easing((timeSinceStart) / duration));
                 yield return null;
             }
 
             modifyGameObject(1f);
+
+            if (endDelay > 0f)
+                yield return new WaitForSeconds(endDelay);
             onDone?.Invoke(this);
         }
     }

@@ -4,7 +4,8 @@ using UnityEngine;
 using System;
 
 
-namespace hjijijing.Tweening {
+namespace hjijijing.Tweening
+{
 
 
     public abstract class AnimationTweeningActionCallback<T> : AnimationTweeningAction<T>
@@ -12,7 +13,8 @@ namespace hjijijing.Tweening {
 
         protected Action<T> callback;
 
-        public AnimationTweeningActionCallback(Action<ITweener> onDone, MonoBehaviour mono, GameObject gameObject, float duration, T startValue, T endValue, Action<T> callback) : base(onDone, mono, gameObject, duration, endValue) {
+        public AnimationTweeningActionCallback(Action<ITweener> onDone, MonoBehaviour mono, GameObject gameObject, T startValue, T endValue, Action<T> callback, float duration, float startDelay = 0f, float endDelay = 0f) : base(onDone, mono, gameObject, endValue, duration, startDelay, endDelay)
+        {
             this.startValue = startValue;
             this.callback = callback;
         }
@@ -32,7 +34,7 @@ namespace hjijijing.Tweening {
     public class Vector3TweeningActionCallback : AnimationTweeningActionCallback<Vector3>
     {
 
-        public Vector3TweeningActionCallback(Action<ITweener> onDone, MonoBehaviour mono, GameObject gameObject, float duration, Vector3 startValue, Vector3 endValue, Action<Vector3> callback) : base(onDone, mono, gameObject, duration, startValue, endValue, callback) { }
+        public Vector3TweeningActionCallback(Action<ITweener> onDone, MonoBehaviour mono, GameObject gameObject, Vector3 startValue, Vector3 endValue, Action<Vector3> callback, float duration, float startDelay = 0f, float endDelay = 0f) : base(onDone, mono, gameObject, startValue, endValue, callback, duration, startDelay, endDelay) { }
 
         public override void modifyGameObject(float time)
         {
@@ -43,7 +45,7 @@ namespace hjijijing.Tweening {
     public class Vector2TweeningActionCallback : AnimationTweeningActionCallback<Vector2>
     {
 
-        public Vector2TweeningActionCallback(Action<ITweener> onDone, MonoBehaviour mono, GameObject gameObject, float duration, Vector2 startValue, Vector2 endValue, Action<Vector2> callback) : base(onDone, mono, gameObject, duration, startValue, endValue, callback) { }
+        public Vector2TweeningActionCallback(Action<ITweener> onDone, MonoBehaviour mono, GameObject gameObject, Vector2 startValue, Vector2 endValue, Action<Vector2> callback, float duration, float startDelay = 0f, float endDelay = 0f) : base(onDone, mono, gameObject, startValue, endValue, callback, duration, startDelay, endDelay) { }
 
         public override void modifyGameObject(float time)
         {
@@ -55,7 +57,7 @@ namespace hjijijing.Tweening {
     public class FloatTweeningActionCallback : AnimationTweeningActionCallback<float>
     {
 
-        public FloatTweeningActionCallback(Action<ITweener> onDone, MonoBehaviour mono, GameObject gameObject, float duration, float startValue, float endValue, Action<float> callback) : base(onDone, mono, gameObject, duration, startValue, endValue, callback) { }
+        public FloatTweeningActionCallback(Action<ITweener> onDone, MonoBehaviour mono, GameObject gameObject, float startValue, float endValue, Action<float> callback, float duration, float startDelay = 0f, float endDelay = 0f) : base(onDone, mono, gameObject, startValue, endValue, callback, duration, startDelay, endDelay) { }
 
         public override void modifyGameObject(float time)
         {
@@ -67,7 +69,7 @@ namespace hjijijing.Tweening {
     public class ColorTweeningActionCallback : AnimationTweeningActionCallback<Color>
     {
 
-        public ColorTweeningActionCallback(Action<ITweener> onDone, MonoBehaviour mono, GameObject gameObject, float duration, Color startValue, Color endValue, Action<Color> callback) : base(onDone, mono, gameObject, duration, startValue, endValue, callback) { }
+        public ColorTweeningActionCallback(Action<ITweener> onDone, MonoBehaviour mono, GameObject gameObject, Color startValue, Color endValue, Action<Color> callback, float duration, float startDelay = 0f, float endDelay = 0f) : base(onDone, mono, gameObject, startValue, endValue, callback, duration, startDelay, endDelay) { }
 
         public override void modifyGameObject(float time)
         {
@@ -79,7 +81,7 @@ namespace hjijijing.Tweening {
     public class IntTweeningActionCallback : AnimationTweeningActionCallback<int>
     {
 
-        public IntTweeningActionCallback(Action<ITweener> onDone, MonoBehaviour mono, GameObject gameObject, float duration, int startValue, int endValue, Action<int> callback) : base(onDone, mono, gameObject, duration, startValue, endValue, callback) { }
+        public IntTweeningActionCallback(Action<ITweener> onDone, MonoBehaviour mono, GameObject gameObject, int startValue, int endValue, Action<int> callback, float duration, float startDelay = 0f, float endDelay = 0f) : base(onDone, mono, gameObject, startValue, endValue, callback, duration, startDelay, endDelay) { }
 
         public override void modifyGameObject(float time)
         {
@@ -91,7 +93,7 @@ namespace hjijijing.Tweening {
     public class QuaternionTweeningActionCallback : AnimationTweeningActionCallback<Quaternion>
     {
 
-        public QuaternionTweeningActionCallback(Action<ITweener> onDone, MonoBehaviour mono, GameObject gameObject, float duration, Quaternion startValue, Quaternion endValue, Action<Quaternion> callback) : base(onDone, mono, gameObject, duration, startValue, endValue, callback) { }
+        public QuaternionTweeningActionCallback(Action<ITweener> onDone, MonoBehaviour mono, GameObject gameObject, Quaternion startValue, Quaternion endValue, Action<Quaternion> callback, float duration, float startDelay = 0f, float endDelay = 0f) : base(onDone, mono, gameObject, startValue, endValue, callback, duration, startDelay, endDelay) { }
 
         public override void modifyGameObject(float time)
         {
@@ -103,7 +105,7 @@ namespace hjijijing.Tweening {
     public class StringTweeningActionCallback : AnimationTweeningActionCallback<string>
     {
 
-        public StringTweeningActionCallback(Action<ITweener> onDone, MonoBehaviour mono, GameObject gameObject, float duration, string startValue, string endValue, Action<string> callback) : base(onDone, mono, gameObject, duration, startValue, endValue, callback) { }
+        public StringTweeningActionCallback(Action<ITweener> onDone, MonoBehaviour mono, GameObject gameObject, string startValue, string endValue, Action<string> callback, float duration, float startDelay = 0f, float endDelay = 0f) : base(onDone, mono, gameObject, startValue, endValue, callback, duration, startDelay, endDelay) { }
 
         public override void modifyGameObject(float time)
         {

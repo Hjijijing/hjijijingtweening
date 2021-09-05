@@ -3,12 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace hjijijing.Tweening {
+namespace hjijijing.Tweening
+{
 
     public class ScaleTweener : AnimationTweeningAction<Vector3>
     {
 
-        public ScaleTweener(Action<ITweener> onDone, MonoBehaviour mono, GameObject gameObject, float duration, Vector3 endValue) : base(onDone, mono, gameObject, duration, endValue) { }
+        public ScaleTweener(Action<ITweener> onDone, MonoBehaviour mono, GameObject gameObject, Vector3 endValue, float duration, float startDelay = 0f, float endDelay = 0f) : base(onDone, mono, gameObject, endValue, duration, startDelay, endDelay) { }
 
 
         public override void modifyGameObject(float time)

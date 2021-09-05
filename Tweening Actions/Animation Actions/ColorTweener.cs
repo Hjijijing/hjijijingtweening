@@ -9,7 +9,7 @@ namespace hjijijing.Tweening
     public class MeshColorTweener : AnimationTweeningAction<Color>
     {
 
-        public MeshColorTweener(Action<ITweener> onDone, MonoBehaviour mono, GameObject gameObject, float duration, Color endValue) : base(onDone, mono, gameObject, duration, endValue) { }
+        public MeshColorTweener(Action<ITweener> onDone, MonoBehaviour mono, GameObject gameObject, Color endValue, float duration, float startDelay = 0f, float endDelay = 0f) : base(onDone, mono, gameObject, endValue, duration, startDelay, endDelay) { }
 
         public override void modifyGameObject(float time)
         {

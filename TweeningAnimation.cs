@@ -156,15 +156,15 @@ namespace hjijijing.Tweening
         }
         #region Tweeners
 
-        public TweeningAnimation move(Vector3 targetPosition, float duration)
+        public TweeningAnimation move(Vector3 targetPosition, float duration, float startDelay = 0f, float endDelay = 0f)
         {
             return move(gameObject, targetPosition, duration);
         }
 
-        public TweeningAnimation move(GameObject gameObject, Vector3 targetPosition, float duration)
+        public TweeningAnimation move(GameObject gameObject, Vector3 targetPosition, float duration, float startDelay = 0f, float endDelay = 0f)
         {
             if (gameObject == null) return this;
-            PositionTweener action = new PositionTweener(tweenDone, source, gameObject, duration, targetPosition);
+            PositionTweener action = new PositionTweener(tweenDone, source, gameObject, targetPosition, duration, startDelay, endDelay);
             latestBuildAction = action;
 
 
@@ -175,45 +175,45 @@ namespace hjijijing.Tweening
 
 
 
-        public TweeningAnimation colorMesh(Color targetColor, float duration)
+        public TweeningAnimation colorMesh(Color targetColor, float duration, float startDelay = 0f, float endDelay = 0f)
         {
             return colorMesh(gameObject, targetColor, duration);
         }
 
-        public TweeningAnimation colorMesh(GameObject gameObject, Color targetColor, float duration)
+        public TweeningAnimation colorMesh(GameObject gameObject, Color targetColor, float duration, float startDelay = 0f, float endDelay = 0f)
         {
             if (gameObject == null) return this;
-            MeshColorTweener action = new MeshColorTweener(tweenDone, source, gameObject, duration, targetColor);
+            MeshColorTweener action = new MeshColorTweener(tweenDone, source, gameObject, targetColor, duration, startDelay, endDelay);
             latestBuildAction = action;
 
             builder.Add(action);
             return this;
         }
 
-        public TweeningAnimation rotate(Quaternion targetRotation, float duration)
+        public TweeningAnimation rotate(Quaternion targetRotation, float duration, float startDelay = 0f, float endDelay = 0f)
         {
             return rotate(gameObject, targetRotation, duration);
         }
 
-        public TweeningAnimation rotate(GameObject gameObject, Quaternion targetRotation, float duration)
+        public TweeningAnimation rotate(GameObject gameObject, Quaternion targetRotation, float duration, float startDelay = 0f, float endDelay = 0f)
         {
             if (gameObject == null) return this;
-            RotationTweener action = new RotationTweener(tweenDone, source, gameObject, duration, targetRotation);
+            RotationTweener action = new RotationTweener(tweenDone, source, gameObject, targetRotation, duration, startDelay, endDelay);
             latestBuildAction = action;
 
             builder.Add(action);
             return this;
         }
 
-        public TweeningAnimation scale(Vector3 targetScale, float duration)
+        public TweeningAnimation scale(Vector3 targetScale, float duration, float startDelay = 0f, float endDelay = 0f)
         {
             return scale(gameObject, targetScale, duration);
         }
 
-        public TweeningAnimation scale(GameObject gameObject, Vector3 targetScale, float duration)
+        public TweeningAnimation scale(GameObject gameObject, Vector3 targetScale, float duration, float startDelay = 0f, float endDelay = 0f)
         {
             if (gameObject == null) return this;
-            ScaleTweener action = new ScaleTweener(tweenDone, source, gameObject, duration, targetScale);
+            ScaleTweener action = new ScaleTweener(tweenDone, source, gameObject, targetScale, duration, startDelay, endDelay);
             latestBuildAction = action;
 
 
@@ -223,54 +223,54 @@ namespace hjijijing.Tweening
         }
 
 
-        public TweeningAnimation vector3Callback(Vector3 start, Vector3 end, Action<Vector3> callback, float duration)
+        public TweeningAnimation vector3Callback(Vector3 start, Vector3 end, Action<Vector3> callback, float duration, float startDelay = 0f, float endDelay = 0f)
         {
-            Vector3TweeningActionCallback action = new Vector3TweeningActionCallback(tweenDone, source, gameObject, duration, start, end, callback);
+            Vector3TweeningActionCallback action = new Vector3TweeningActionCallback(tweenDone, source, gameObject, start, end, callback, duration, startDelay, endDelay);
             latestBuildAction = action;
 
             builder.Add(action);
             return this;
         }
 
-        public TweeningAnimation vector2Callback(Vector2 start, Vector2 end, Action<Vector2> callback, float duration)
+        public TweeningAnimation vector2Callback(Vector2 start, Vector2 end, Action<Vector2> callback, float duration, float startDelay = 0f, float endDelay = 0f)
         {
-            Vector2TweeningActionCallback action = new Vector2TweeningActionCallback(tweenDone, source, gameObject, duration, start, end, callback);
+            Vector2TweeningActionCallback action = new Vector2TweeningActionCallback(tweenDone, source, gameObject, start, end, callback, duration, startDelay, endDelay);
             latestBuildAction = action;
 
             builder.Add(action);
             return this;
         }
 
-        public TweeningAnimation floatCallback(float start, float end, Action<float> callback, float duration)
+        public TweeningAnimation floatCallback(float start, float end, Action<float> callback, float duration, float startDelay = 0f, float endDelay = 0f)
         {
-            FloatTweeningActionCallback action = new FloatTweeningActionCallback(tweenDone, source, gameObject, duration, start, end, callback);
+            FloatTweeningActionCallback action = new FloatTweeningActionCallback(tweenDone, source, gameObject, start, end, callback, duration, startDelay, endDelay);
             latestBuildAction = action;
 
             builder.Add(action);
             return this;
         }
 
-        public TweeningAnimation intCallback(int start, int end, Action<int> callback, float duration)
+        public TweeningAnimation intCallback(int start, int end, Action<int> callback, float duration, float startDelay = 0f, float endDelay = 0f)
         {
-            IntTweeningActionCallback action = new IntTweeningActionCallback(tweenDone, source, gameObject, duration, start, end, callback);
+            IntTweeningActionCallback action = new IntTweeningActionCallback(tweenDone, source, gameObject, start, end, callback, duration, startDelay, endDelay);
             latestBuildAction = action;
 
             builder.Add(action);
             return this;
         }
 
-        public TweeningAnimation QuaternionCallback(Quaternion start, Quaternion end, Action<Quaternion> callback, float duration)
+        public TweeningAnimation QuaternionCallback(Quaternion start, Quaternion end, Action<Quaternion> callback, float duration, float startDelay = 0f, float endDelay = 0f)
         {
-            QuaternionTweeningActionCallback action = new QuaternionTweeningActionCallback(tweenDone, source, gameObject, duration, start, end, callback);
+            QuaternionTweeningActionCallback action = new QuaternionTweeningActionCallback(tweenDone, source, gameObject, start, end, callback, duration, startDelay, endDelay);
             latestBuildAction = action;
 
             builder.Add(action);
             return this;
         }
 
-        public TweeningAnimation stringCallback(string start, string end, Action<string> callback, float duration)
+        public TweeningAnimation stringCallback(string start, string end, Action<string> callback, float duration, float startDelay = 0f, float endDelay = 0f)
         {
-            StringTweeningActionCallback action = new StringTweeningActionCallback(tweenDone, source, gameObject, duration, start, end, callback);
+            StringTweeningActionCallback action = new StringTweeningActionCallback(tweenDone, source, gameObject, start, end, callback, duration, startDelay, endDelay);
             latestBuildAction = action;
 
 

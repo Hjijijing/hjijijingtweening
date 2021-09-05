@@ -9,7 +9,7 @@ namespace hjijijing.Tweening
     public class RotationTweener : AnimationTweeningAction<Quaternion>
     {
 
-        public RotationTweener(Action<ITweener> onDone, MonoBehaviour mono, GameObject gameObject, float duration, Quaternion endValue) : base(onDone, mono, gameObject, duration, endValue) { }
+        public RotationTweener(Action<ITweener> onDone, MonoBehaviour mono, GameObject gameObject, Quaternion endValue, float duration, float startDelay = 0f, float endDelay = 0f) : base(onDone, mono, gameObject, endValue, duration, startDelay, endDelay) { }
 
 
         public override void modifyGameObject(float time)
