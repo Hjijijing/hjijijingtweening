@@ -137,15 +137,6 @@ namespace hjijijing.Tweening
             if (ongoingTweens.Count == 0) StartNextQueue();
         }
 
-        /// <summary>
-        /// Internal function that is called by tweeners every time a tween has finished. When all tweens in the currently executing builder has finished, this function will begin the next queue
-        /// </summary>
-        /// <param name="tweener">The tweener that has finished</param>
-        protected void tweenDone(ITweener tweener)
-        {
-            ongoingTweens.Remove(tweener);
-            if (ongoingTweens.Count == 0) StartNextQueue();
-        }
 
         /// <summary>
         /// Stops the tweening animation
