@@ -10,8 +10,14 @@ namespace hjijijing.Tweening
 
         HashSet<string> markers = new HashSet<string>();
 
-        List<ITweener> ongoingTweens = new List<ITweener>();
+        /// <summary>
+        /// List of tweens that are currently animating.
+        /// </summary>
+        public List<ITweener> ongoingTweens = new List<ITweener>();
 
+        /// <summary>
+        /// The latest action that has been added to the builder.
+        /// </summary>
         public ITweeningAction latestBuildAction;
 
         public delegate void TweenSequenceDone();
@@ -27,6 +33,8 @@ namespace hjijijing.Tweening
                     ongoingTweens.Add((ITweener)action);
                 }
             }
+
+            if (ongoingTweens.Count == 0) onTweenSequenceDone?.Invoke();
 
         }
 
@@ -116,7 +124,30 @@ namespace hjijijing.Tweening
             return reverseSequence;
         }
 
+        public void ForceFinish()
+        {
+            ForEachITweener((action) => { action.forceFinish(); });
+        }
 
+        public void Revert()
+        {
+            ForEachITweener((action) => { action.revert(); });
+        }
+
+        public void ForEachITweener(Action<ITweener> callback)
+        {
+            foreach (ITweeningAction action in this)
+            {
+                if (!(action is ITweener)) continue;
+                callback.Invoke((ITweener)action);
+            }
+        }
+
+
+        public bool IsEmpty()
+        {
+            return Count == 0;
+        }
 
 
     }

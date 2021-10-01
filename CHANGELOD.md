@@ -1,3 +1,6 @@
+# 1.0.9pre2 - 05-09-2021
+### Error:
+- Reversing no longer works :I
 # 1.0.9pre1 - 05-09-2021
 ### Changed:
 - Completely changed the way tweens are stored in TweeningAnimation, by making a TweeningSequence class
