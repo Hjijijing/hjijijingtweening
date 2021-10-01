@@ -12,7 +12,7 @@ namespace hjijijing.Tweening
         public WaitForTime(Action<ITweener> onDone, MonoBehaviour mono, GameObject gameObject, float duration) : base(onDone, mono, gameObject, duration, duration) { }
 
 
-        public override ITweeningAction getReverse()
+        public override ITweeningAction getReverse(Action<ITweener> onDone)
         {
             return new WaitForTime(onDone, mono, gameObject, duration);
         }

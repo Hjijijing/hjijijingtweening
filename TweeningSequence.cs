@@ -23,7 +23,7 @@ namespace hjijijing.Tweening
         public delegate void TweenSequenceDone();
         public TweenSequenceDone onTweenSequenceDone;
 
-        public void StartSequence()
+        public void StartSequence(Action onSequenceStarted = null)
         {
             foreach (ITweeningAction action in this)
             {
@@ -33,6 +33,8 @@ namespace hjijijing.Tweening
                     ongoingTweens.Add((ITweener)action);
                 }
             }
+
+            onSequenceStarted?.Invoke();
 
             if (ongoingTweens.Count == 0) onTweenSequenceDone?.Invoke();
 
@@ -88,6 +90,27 @@ namespace hjijijing.Tweening
             markers.Add(marker);
         }
 
+        public void AddMarker(string prefix, string marker)
+        {
+            AddMarker(prefix + marker);
+        }
+
+        public void AddMarkers(HashSet<string> newMarkers)
+        {
+            foreach(string newMarker in newMarkers)
+            {
+                AddMarker(newMarker);
+            }
+        }
+
+        public void AddMarkers(string prefix, HashSet<string> newMarkers)
+        {
+            foreach (string newMarker in newMarkers)
+            {
+                AddMarker(prefix, newMarker);
+            }
+        }
+
         public void RemoveMarker(string marker)
         {
             markers.Remove(marker);
@@ -103,20 +126,24 @@ namespace hjijijing.Tweening
             return markers;
         }
 
+
         public TweeningSequence GetReverse()
         {
             TweeningSequence reverseSequence = new TweeningSequence();
-            foreach(ITweeningAction action in this)
+            reverseSequence.AddMarkers("rev", markers);
+
+            foreach (ITweeningAction action in this)
             {
                 ITweeningAction actionToAdd;
                 if (action is ITweener)
                 {
-                    actionToAdd = ((ITweener)action).getReverse();
+                    actionToAdd = ((ITweener)action).getReverse(reverseSequence.tweenDone);
                 }
                 else
                 {
                     actionToAdd = action;
                 }
+
 
                 reverseSequence.Add(actionToAdd);
             }
@@ -127,11 +154,13 @@ namespace hjijijing.Tweening
         public void ForceFinish()
         {
             ForEachITweener((action) => { action.forceFinish(); });
+            ongoingTweens.Clear();
         }
 
         public void Revert()
         {
             ForEachITweener((action) => { action.revert(); });
+            ongoingTweens.Clear();
         }
 
         public void ForEachITweener(Action<ITweener> callback)
@@ -147,6 +176,29 @@ namespace hjijijing.Tweening
         public bool IsEmpty()
         {
             return Count == 0;
+        }
+
+
+        public override string ToString()
+        {
+            string result = "Tweening Sequence\n";
+
+            string markersString = "Markers: ";
+            foreach(string marker in markers)
+            {
+                markersString += marker + ", ";
+            }
+
+            markersString = markersString.Substring(0, markersString.Length - 2) + "\n";
+
+            result += markersString;
+
+            foreach(ITweeningAction a in this)
+            {
+                result += a.ToString() + "\n";
+            }
+
+            return result;
         }
 
 

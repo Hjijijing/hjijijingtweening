@@ -11,7 +11,7 @@ namespace hjijijing.Tweening
 
         public ScaleTweener(Action<ITweener> onDone, MonoBehaviour mono, GameObject gameObject, Vector3 endValue, float duration, float startDelay = 0f, float endDelay = 0f) : base(onDone, mono, gameObject, endValue, duration, startDelay, endDelay) { }
 
-        public override ITweeningAction getReverse()
+        public override ITweeningAction getReverse(Action<ITweener> onDone)
         {
             return new ScaleTweener(onDone, mono, gameObject, startValue, duration, startDelay, endDelay);
         }

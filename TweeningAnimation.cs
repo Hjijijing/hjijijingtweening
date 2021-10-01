@@ -126,9 +126,13 @@ namespace hjijijing.Tweening
             currentPlayingSequence = sequence;
 
             sequence.onTweenSequenceDone += StartNextQueue;
-            sequence.StartSequence();
 
-            queueNumber++;
+           
+            
+
+            sequence.StartSequence(()=> { queueNumber++; });
+
+            
 
         }
 
@@ -652,10 +656,16 @@ namespace hjijijing.Tweening
 
                 for(int i = 0; i < reverseQueueNumber; i++)
                 {
-                    actionQueues.Insert(reverseQueueNumber, actionQueues[i].GetReverse());
+                    TweeningSequence sequence = actionQueues[i];
+                    TweeningSequence reverseSequence = sequence.GetReverse();
+
+
+
+                    actionQueues.Insert(reverseQueueNumber, reverseSequence);
                 }
 
-                SetQueueNumber(queueNumber - 1);
+                //SetQueueNumber(queueNumber - 1);
+                SetQueueNumber(reverseQueueNumber-1);
             };
         }
 

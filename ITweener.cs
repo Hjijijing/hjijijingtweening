@@ -20,7 +20,7 @@ namespace hjijijing.Tweening
 
         IEnumerator execute(Action<ITweener> onDone);
 
-        ITweeningAction getReverse();
+        ITweeningAction getReverse(Action<ITweener> onDone);
     }
 
 

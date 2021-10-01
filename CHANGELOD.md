@@ -1,4 +1,8 @@
-# 1.0.9pre2 - 05-09-2021
+# 1.0.9pre3 - 01-10-2021
+### Fixed:
+- The new Sequence system now works.
+- Fixed dates in previous changelog entry
+# 1.0.9pre2 - 01-10-2021
 ### Error:
 - Reversing no longer works :I
 # 1.0.9pre1 - 05-09-2021
