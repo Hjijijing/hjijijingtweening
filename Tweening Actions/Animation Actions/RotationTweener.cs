@@ -11,7 +11,7 @@ namespace hjijijing.Tweening
 
         public RotationTweener(Action<ITweener> onDone, MonoBehaviour mono, GameObject gameObject, Quaternion endValue, float duration, float startDelay = 0f, float endDelay = 0f) : base(onDone, mono, gameObject, endValue, duration, startDelay, endDelay) { }
 
-        public override ITweeningAction getReverse()
+        public override ITweeningAction getReverse(Action<ITweener> onDone)
         {
             return new RotationTweener(onDone, mono, gameObject, startValue, duration, startDelay, endDelay);
         }

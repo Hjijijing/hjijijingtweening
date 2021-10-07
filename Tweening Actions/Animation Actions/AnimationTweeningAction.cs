@@ -56,13 +56,13 @@ namespace hjijijing.Tweening
             modifyGameObject(0f);
         }
 
-        public void reverse()
+       /* public void reverse()
         {
             T temp = startValue;
             startValue = endValue;
             endValue = temp;
         }
-
+        */
 
         public void doAction()
         {
@@ -92,6 +92,7 @@ namespace hjijijing.Tweening
                 yield return null;
             }
 
+
             modifyGameObject(1f);
 
             if (endDelay > 0f)
@@ -99,8 +100,17 @@ namespace hjijijing.Tweening
             onDone?.Invoke(this);
         }
 
-        public abstract ITweeningAction getReverse();
+        public abstract ITweeningAction getReverse(Action<ITweener> onDone);
+
+
+        public override string ToString()
+        {
+            return "Start Value: " + startValue + " End Value: " + endValue + " Duration: " + duration + " Start Delay: " + startDelay + " End Delay: " + endDelay;
+        }
     }
+
+
+    
 
 
 }

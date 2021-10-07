@@ -41,7 +41,7 @@ namespace hjijijing.Tweening
             callback?.Invoke(Vector3.LerpUnclamped(startValue, endValue, time));
         }
 
-        public override ITweeningAction getReverse()
+        public override ITweeningAction getReverse(Action<ITweener> onDone)
         {
             return new Vector3TweeningActionCallback(onDone, mono, gameObject, endValue, startValue, callback, duration, startDelay, endDelay);
         }
@@ -57,7 +57,7 @@ namespace hjijijing.Tweening
             callback?.Invoke(Vector2.LerpUnclamped(startValue, endValue, time));
         }
 
-        public override ITweeningAction getReverse()
+        public override ITweeningAction getReverse(Action<ITweener> onDone)
         {
             return new Vector2TweeningActionCallback(onDone, mono, gameObject, endValue, startValue, callback, duration, startDelay, endDelay);
         }
@@ -75,7 +75,7 @@ namespace hjijijing.Tweening
 
         }
 
-        public override ITweeningAction getReverse()
+        public override ITweeningAction getReverse(Action<ITweener> onDone)
         {
             return new FloatTweeningActionCallback(onDone, mono, gameObject, endValue, startValue, callback, duration, startDelay, endDelay);
         }
@@ -91,7 +91,7 @@ namespace hjijijing.Tweening
             callback?.Invoke(Color.LerpUnclamped(startValue, endValue, time));
         }
 
-        public override ITweeningAction getReverse()
+        public override ITweeningAction getReverse(Action<ITweener> onDone)
         {
             return new ColorTweeningActionCallback(onDone, mono, gameObject, endValue, startValue, callback, duration, startDelay, endDelay);
         }
@@ -109,7 +109,7 @@ namespace hjijijing.Tweening
 
         }
 
-        public override ITweeningAction getReverse()
+        public override ITweeningAction getReverse(Action<ITweener> onDone)
         {
             return new IntTweeningActionCallback(onDone, mono, gameObject, endValue, startValue, callback, duration, startDelay, endDelay);
         }
@@ -126,7 +126,7 @@ namespace hjijijing.Tweening
 
         }
 
-        public override ITweeningAction getReverse()
+        public override ITweeningAction getReverse(Action<ITweener> onDone)
         {
             return new QuaternionTweeningActionCallback(onDone, mono, gameObject, endValue, startValue, callback, duration, startDelay, endDelay);
         }
@@ -147,7 +147,7 @@ namespace hjijijing.Tweening
 
         }
 
-        public override ITweeningAction getReverse()
+        public override ITweeningAction getReverse(Action<ITweener> onDone)
         {
             return new StringTweeningActionCallback(onDone, mono, gameObject, endValue, startValue, callback, duration, startDelay, endDelay);
         }

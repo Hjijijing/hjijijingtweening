@@ -28,7 +28,7 @@ namespace hjijijing.Tweening
         /// <summary>
         /// The list of queues of tweening animations.
         /// </summary>
-        public List<List<ITweeningAction>> actionQueues = new List<List<ITweeningAction>>();
+        public List<TweeningSequence> actionQueues = new List<TweeningSequence>();
 
         /// <summary>
         /// The current queue number
@@ -36,19 +36,16 @@ namespace hjijijing.Tweening
         public int queueNumber = 0;
 
         /// <summary>
-        /// List of tweens that are currently animating.
+        /// The sequence that is currently playing
         /// </summary>
-        public List<ITweener> ongoingTweens = new List<ITweener>();
-
+        public TweeningSequence currentPlayingSequence;
+        
         /// <summary>
         /// Lists of tweens that are being build in the latest queue.
         /// </summary>
-        public List<ITweeningAction> builder = new List<ITweeningAction>();
+        public TweeningSequence builder = new TweeningSequence();
 
-        /// <summary>
-        /// The latest action that has been added to the builder.
-        /// </summary>
-        public ITweeningAction latestBuildAction = null;
+       
 
         /// <summary>
         /// Creates a tweening animation with the given source and primary gameobject
@@ -112,7 +109,7 @@ namespace hjijijing.Tweening
         {
             if (builder.Count != 0)
                 actionQueues.Add(builder);
-            builder = new List<ITweeningAction>();
+            builder = new TweeningSequence();
         }
 
         /// <summary>
@@ -120,42 +117,33 @@ namespace hjijijing.Tweening
         /// </summary>
         protected void StartNextQueue()
         {
+            if(currentPlayingSequence != null)
+                currentPlayingSequence.onTweenSequenceDone -= StartNextQueue;
+
             if (queueNumber >= actionQueues.Count) return;
 
-            List<ITweeningAction> actionQueue = actionQueues[queueNumber];
+            TweeningSequence sequence = actionQueues[queueNumber];
+            currentPlayingSequence = sequence;
 
-            foreach (ITweeningAction action in actionQueue)
-            {
-                action.doAction();
-                if (action is ITweener)
-                {
-                    ongoingTweens.Add((ITweener)action);
-                }
-            }
-            queueNumber++;
+            sequence.onTweenSequenceDone += StartNextQueue;
 
-            if (ongoingTweens.Count == 0) StartNextQueue();
+           
+            
+
+            sequence.StartSequence(()=> { queueNumber++; });
+
+            
+
         }
 
-        /// <summary>
-        /// Internal function that is called by tweeners every time a tween has finished. When all tweens in the currently executing builder has finished, this function will begin the next queue
-        /// </summary>
-        /// <param name="tweener">The tweener that has finished</param>
-        protected void tweenDone(ITweener tweener)
-        {
-            ongoingTweens.Remove(tweener);
-            if (ongoingTweens.Count == 0) StartNextQueue();
-        }
 
         /// <summary>
         /// Stops the tweening animation
         /// </summary>
         public void Stop()
         {
-            foreach (ITweener tweener in ongoingTweens)
-            {
-                tweener.Stop();
-            }
+            if (currentPlayingSequence == null) return;
+            currentPlayingSequence.StopSequence();
         }
 
         /// <summary>
@@ -165,14 +153,9 @@ namespace hjijijing.Tweening
         {
             for (int i = 0; i < actionQueues.Count; i++)
             {
-                List<ITweeningAction> actionQueue = actionQueues[i];
+                TweeningSequence sequence = actionQueues[i];
 
-                for (int j = 0; j < actionQueue.Count; j++)
-                {
-                    ITweeningAction action = actionQueue[j];
-                    if (!(action is ITweener)) continue;
-                    ((ITweener)action).forceFinish();
-                }
+                sequence.ForceFinish();
             }
         }
 
@@ -185,14 +168,9 @@ namespace hjijijing.Tweening
 
             for (int i = queueNumber; i > -1; i--)
             {
-                List<ITweeningAction> actionQueue = actionQueues[i];
+                TweeningSequence sequence = actionQueues[i];
 
-                for (int j = actionQueue.Count - 1; i > -1; j--)
-                {
-                    ITweeningAction action = actionQueue[j];
-                    if (!(action is ITweener)) continue;
-                    ((ITweener)action).revert();
-                }
+                sequence.Revert();
             }
         }
 
@@ -247,12 +225,20 @@ namespace hjijijing.Tweening
         /// <returns></returns>
         public TweeningAnimation SetEasing(Func<float, float> easing)
         {
-            if (latestBuildAction == null) return this;
-            if (!(latestBuildAction is ITweener)) return this;
+            if(!builder.IsEmpty())
+            {
+                builder.SetEasingLatest(easing);
+                return this;
+            }
 
-            ITweener action = (ITweener)latestBuildAction;
+            if (actionQueues.Count == 0) return this;
 
-            action.easing = easing;
+            for(int i = actionQueues.Count-1; i > -1; i++)
+            {
+                if (actionQueues[i].IsEmpty()) continue;
+                actionQueues[i].SetEasingLatest(easing);
+                return this;
+            }
 
             return this;
         }
@@ -264,11 +250,7 @@ namespace hjijijing.Tweening
         /// <returns></returns>
         public TweeningAnimation SetEasingBuilder(Func<float, float> easing)
         {
-            foreach (ITweeningAction a in builder)
-            {
-                if (!(a is ITweener)) continue;
-                ((ITweener)a).easing = easing;
-            }
+            builder.SetEasingAll(easing);
 
             return this;
         }
@@ -280,42 +262,49 @@ namespace hjijijing.Tweening
         /// <returns></returns>
         public TweeningAnimation SetEasingAll(Func<float, float> easing)
         {
-            foreach (List<ITweeningAction> l in actionQueues)
+            foreach (TweeningSequence seq in actionQueues)
             {
-                foreach (ITweeningAction a in l)
-                {
-                    if (!(a is ITweener)) continue;
-                    ((ITweener)a).easing = easing;
-                }
+                seq.SetEasingAll(easing);
             }
 
 
-            foreach (ITweeningAction a in builder)
-            {
-                if (!(a is ITweener)) continue;
-                ((ITweener)a).easing = easing;
-            }
+            builder.SetEasingAll(easing);
 
             return this;
         }
 
 
-        protected void AddActionToBuilder(ITweeningAction action)
+        protected ITweeningAction ApplyDefaultEasing(ITweeningAction action)
         {
             if (action is ITweener)
             {
                 ((ITweener)action).easing = easing;
             }
-            builder.Add(action);
+
+            return action;
+        }
+
+        protected void AddActionToBuilder(ITweeningAction action)
+        {
+            builder.Add(ApplyDefaultEasing(action));
         }
 
         protected void InsertActionToBuilder(ITweeningAction action, int index)
         {
-            if (action is ITweener)
+            builder.Insert(0, ApplyDefaultEasing(action));
+        }
+
+        public ITweeningAction GetLatestAddedAction()
+        {
+            if (!builder.IsEmpty()) return builder.latestBuildAction;
+
+            for (int i = actionQueues.Count - 1; i > -1; i++)
             {
-                ((ITweener)action).easing = easing;
+                if (actionQueues[i].IsEmpty()) continue;
+                return actionQueues[i].latestBuildAction;
             }
-            builder.Insert(0, action);
+
+            return null;
         }
 
         #region Tweeners
@@ -345,10 +334,7 @@ namespace hjijijing.Tweening
         public TweeningAnimation move(GameObject gameObject, Vector3 targetPosition, float duration, float startDelay = 0f, float endDelay = 0f)
         {
             if (gameObject == null) return this;
-            PositionTweener action = new PositionTweener(tweenDone, source, gameObject, targetPosition, duration, startDelay, endDelay);
-            latestBuildAction = action;
-
-
+            PositionTweener action = new PositionTweener(builder.tweenDone, source, gameObject, targetPosition, duration, startDelay, endDelay);
 
             AddActionToBuilder(action);
             return this;
@@ -380,8 +366,7 @@ namespace hjijijing.Tweening
         public TweeningAnimation colorMesh(GameObject gameObject, Color targetColor, float duration, float startDelay = 0f, float endDelay = 0f)
         {
             if (gameObject == null) return this;
-            MeshColorTweener action = new MeshColorTweener(tweenDone, source, gameObject, targetColor, duration, startDelay, endDelay);
-            latestBuildAction = action;
+            MeshColorTweener action = new MeshColorTweener(builder.tweenDone, source, gameObject, targetColor, duration, startDelay, endDelay);
 
             AddActionToBuilder(action);
             return this;
@@ -412,8 +397,7 @@ namespace hjijijing.Tweening
         public TweeningAnimation rotate(GameObject gameObject, Quaternion targetRotation, float duration, float startDelay = 0f, float endDelay = 0f)
         {
             if (gameObject == null) return this;
-            RotationTweener action = new RotationTweener(tweenDone, source, gameObject, targetRotation, duration, startDelay, endDelay);
-            latestBuildAction = action;
+            RotationTweener action = new RotationTweener(builder.tweenDone, source, gameObject, targetRotation, duration, startDelay, endDelay);
 
             AddActionToBuilder(action);
             return this;
@@ -444,8 +428,7 @@ namespace hjijijing.Tweening
         public TweeningAnimation scale(GameObject gameObject, Vector3 targetScale, float duration, float startDelay = 0f, float endDelay = 0f)
         {
             if (gameObject == null) return this;
-            ScaleTweener action = new ScaleTweener(tweenDone, source, gameObject, targetScale, duration, startDelay, endDelay);
-            latestBuildAction = action;
+            ScaleTweener action = new ScaleTweener(builder.tweenDone, source, gameObject, targetScale, duration, startDelay, endDelay);
 
 
 
@@ -465,8 +448,7 @@ namespace hjijijing.Tweening
         /// <returns></returns>
         public TweeningAnimation vector3Callback(Vector3 start, Vector3 end, Action<Vector3> callback, float duration, float startDelay = 0f, float endDelay = 0f)
         {
-            Vector3TweeningActionCallback action = new Vector3TweeningActionCallback(tweenDone, source, gameObject, start, end, callback, duration, startDelay, endDelay);
-            latestBuildAction = action;
+            Vector3TweeningActionCallback action = new Vector3TweeningActionCallback(builder.tweenDone, source, gameObject, start, end, callback, duration, startDelay, endDelay);
 
             AddActionToBuilder(action);
             return this;
@@ -484,8 +466,7 @@ namespace hjijijing.Tweening
         /// <returns></returns>
         public TweeningAnimation vector2Callback(Vector2 start, Vector2 end, Action<Vector2> callback, float duration, float startDelay = 0f, float endDelay = 0f)
         {
-            Vector2TweeningActionCallback action = new Vector2TweeningActionCallback(tweenDone, source, gameObject, start, end, callback, duration, startDelay, endDelay);
-            latestBuildAction = action;
+            Vector2TweeningActionCallback action = new Vector2TweeningActionCallback(builder.tweenDone, source, gameObject, start, end, callback, duration, startDelay, endDelay);
 
             AddActionToBuilder(action);
             return this;
@@ -503,8 +484,7 @@ namespace hjijijing.Tweening
         /// <returns></returns>
         public TweeningAnimation floatCallback(float start, float end, Action<float> callback, float duration, float startDelay = 0f, float endDelay = 0f)
         {
-            FloatTweeningActionCallback action = new FloatTweeningActionCallback(tweenDone, source, gameObject, start, end, callback, duration, startDelay, endDelay);
-            latestBuildAction = action;
+            FloatTweeningActionCallback action = new FloatTweeningActionCallback(builder.tweenDone, source, gameObject, start, end, callback, duration, startDelay, endDelay);
 
             AddActionToBuilder(action);
             return this;
@@ -522,8 +502,7 @@ namespace hjijijing.Tweening
         /// <returns></returns>
         public TweeningAnimation intCallback(int start, int end, Action<int> callback, float duration, float startDelay = 0f, float endDelay = 0f)
         {
-            IntTweeningActionCallback action = new IntTweeningActionCallback(tweenDone, source, gameObject, start, end, callback, duration, startDelay, endDelay);
-            latestBuildAction = action;
+            IntTweeningActionCallback action = new IntTweeningActionCallback(builder.tweenDone, source, gameObject, start, end, callback, duration, startDelay, endDelay);
 
             AddActionToBuilder(action);
             return this;
@@ -541,8 +520,7 @@ namespace hjijijing.Tweening
         /// <returns></returns>
         public TweeningAnimation QuaternionCallback(Quaternion start, Quaternion end, Action<Quaternion> callback, float duration, float startDelay = 0f, float endDelay = 0f)
         {
-            QuaternionTweeningActionCallback action = new QuaternionTweeningActionCallback(tweenDone, source, gameObject, start, end, callback, duration, startDelay, endDelay);
-            latestBuildAction = action;
+            QuaternionTweeningActionCallback action = new QuaternionTweeningActionCallback(builder.tweenDone, source, gameObject, start, end, callback, duration, startDelay, endDelay);
 
             AddActionToBuilder(action);
             return this;
@@ -560,8 +538,7 @@ namespace hjijijing.Tweening
         /// <returns></returns>
         public TweeningAnimation stringCallback(string start, string end, Action<string> callback, float duration, float startDelay = 0f, float endDelay = 0f)
         {
-            StringTweeningActionCallback action = new StringTweeningActionCallback(tweenDone, source, gameObject, start, end, callback, duration, startDelay, endDelay);
-            latestBuildAction = action;
+            StringTweeningActionCallback action = new StringTweeningActionCallback(builder.tweenDone, source, gameObject, start, end, callback, duration, startDelay, endDelay);
 
 
             AddActionToBuilder(action);
@@ -580,8 +557,7 @@ namespace hjijijing.Tweening
         /// <returns></returns>
         public TweeningAnimation colorCallback(Color start, Color end, Action<Color> callback, float duration, float startDelay = 0f, float endDelay = 0f)
         {
-            ColorTweeningActionCallback action = new ColorTweeningActionCallback(tweenDone, source, gameObject, start, end, callback, duration, startDelay, endDelay);
-            latestBuildAction = action;
+            ColorTweeningActionCallback action = new ColorTweeningActionCallback(builder.tweenDone, source, gameObject, start, end, callback, duration, startDelay, endDelay);
 
             AddActionToBuilder(action);
             return this;
@@ -596,7 +572,6 @@ namespace hjijijing.Tweening
         public TweeningAnimation call(Action action)
         {
             CallBackIntermediaryAction tweeningaction = new CallBackIntermediaryAction(action);
-            latestBuildAction = tweeningaction;
 
             AddActionToBuilder(tweeningaction);
             return this;
@@ -610,8 +585,7 @@ namespace hjijijing.Tweening
         public TweeningAnimation Wait(float duration)
         {
             then();
-            WaitForTime action = new WaitForTime(tweenDone, source, gameObject, duration);
-            latestBuildAction = action;
+            WaitForTime action = new WaitForTime(builder.tweenDone, source, gameObject, duration);
 
             AddActionToBuilder(action);
             then();
@@ -632,29 +606,11 @@ namespace hjijijing.Tweening
         /// <returns></returns>
         public TweeningAnimation Marker(string marker)
         {
-            MarkerAction markerAction = new MarkerAction(marker);
-            latestBuildAction = markerAction;
-            InsertActionToBuilder(markerAction, 0);
+            builder.AddMarker(marker);
 
             return this;
         }
 
-        /// <summary>
-        /// Checks if the specified queue has the specified marker.
-        /// </summary>
-        /// <param name="marker">The marker to check for</param>
-        /// <param name="queue">The queue to check in</param>
-        /// <returns>True if the queue contains the marker, otherwise false</returns>
-        public bool HasMarker(string marker, List<ITweeningAction> queue)
-        {
-            foreach(ITweeningAction action in queue)
-            {
-                if (!(action is MarkerAction)) break;
-                if (((MarkerAction)action).marker == marker) return true;
-            }
-
-            return false;
-        }
 
         /// <summary>
         /// Checks if the action queue with the specified queue number has the specified marker 
@@ -665,7 +621,7 @@ namespace hjijijing.Tweening
         public bool HasMarker(string marker, int queueNumber)
         {
             if (queueNumber >= actionQueues.Count) return false;
-            return HasMarker(marker, actionQueues[queueNumber]);
+            return actionQueues[queueNumber].HasMarker(marker);
         }
 
         /// <summary>
@@ -675,7 +631,7 @@ namespace hjijijing.Tweening
         /// <returns>True if the builder contains the marker, otherwise false</returns>
         public bool BuilderHasMarker(string marker)
         {
-            return HasMarker(marker, builder);
+            return builder.HasMarker(marker);
         }
         #endregion
 
@@ -700,25 +656,16 @@ namespace hjijijing.Tweening
 
                 for(int i = 0; i < reverseQueueNumber; i++)
                 {
-                    List<ITweeningAction> reverseList = new List<ITweeningAction>();
-                    foreach(ITweeningAction action in actionQueues[i])
-                    {
-                        ITweeningAction actionToAdd;
-                        if(action is ITweener)
-                        {
-                            actionToAdd = ((ITweener)action).getReverse();
-                        } else
-                        {
-                            actionToAdd = action;
-                        }
+                    TweeningSequence sequence = actionQueues[i];
+                    TweeningSequence reverseSequence = sequence.GetReverse();
 
-                        reverseList.Add(actionToAdd);
-                    }
 
-                    actionQueues.Insert(reverseQueueNumber, reverseList);
+
+                    actionQueues.Insert(reverseQueueNumber, reverseSequence);
                 }
 
-                SetQueueNumber(queueNumber - 1);
+                //SetQueueNumber(queueNumber - 1);
+                SetQueueNumber(reverseQueueNumber-1);
             };
         }
 

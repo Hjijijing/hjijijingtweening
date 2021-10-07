@@ -1,3 +1,11 @@
+# 1.0.9 - 07-10-2021
+### Fixed:
+- The new Sequence system now works.
+- Fixed dates in previous changelog entry
+### Error:
+- Reversing no longer works :I
+### Changed:
+- Completely changed the way tweens are stored in TweeningAnimation, by making a TweeningSequence class
 # 1.0.8b - 05-09-2021
 ### Fixed:
 - Fixed yet another reversing issue. On the initial reversal it skipped the first action due to it having same queuenumber as the reverse action.
