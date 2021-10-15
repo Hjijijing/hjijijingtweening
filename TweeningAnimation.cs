@@ -692,6 +692,35 @@ namespace hjijijing.Tweening
 
         #endregion
 
+        #region Branching
+
+        public TweeningAnimation Branch(Func<TweeningAnimation, bool> condition, Action<TweeningAnimation> actionIfTrue, Action<TweeningAnimation> actionIfFalse)
+        {
+            then();
+
+            
+
+            call(()=> {
+                Action<TweeningAnimation> actionToCall = condition(this) ? actionIfTrue : actionIfFalse;
+
+                float stamp = Process.GetCurrentProcess().StartTime;
+
+                then("#" + stamp)
+            
+            
+            });
+
+            then();
+
+            throw new NotImplementedException();
+        }
+
+
+
+        #endregion
+
+
+
     }
 
 }
