@@ -107,8 +107,8 @@ namespace hjijijing.Tweening
         /// </summary>
         protected void commitBuilder()
         {
-            if (builder.Count != 0)
-                actionQueues.Add(builder);
+            if (builder.Count == 0 && !builder.HasAnyMarkers()) return;
+            actionQueues.Add(builder);
             builder = new TweeningSequence();
         }
 
@@ -695,6 +695,9 @@ namespace hjijijing.Tweening
 
         public TweeningAnimation Branch(Func<TweeningAnimation, bool> condition, Action<TweeningAnimation> actionIfTrue, Action<TweeningAnimation> actionIfFalse)
         {
+            
+            int queueNumber = this.queueNumber;
+
             then();
 
             
@@ -703,23 +706,28 @@ namespace hjijijing.Tweening
                 Action<TweeningAnimation> actionToCall = condition(this) ? actionIfTrue : actionIfFalse;
 
                 int markerID = GetUniqueNumber();
+                string marker = "#" + markerID;
+                string markerStart = marker + "start";
+                string markerEnd = marker + "end";
 
-                string markerStart = "#" + markerID;
-                string markerEnd = markerStart + "end";
+
 
                 then(markerStart);
                 then();
                 actionToCall(this);
                 then(markerEnd);
-                call(() => { RemoveSequences(markerStart, markerEnd); });
-            
+                call(() => {RemoveSequences(markerStart, markerEnd); SetQueueNumber(queueNumber); });
+                then();
+
+                int markerQueueNumber = GetMarkerQueueNumber(markerStart);
 
 
+                SetQueueNumber(markerQueueNumber - 1);
             });
 
-            then();
+            return then();
 
-            throw new NotImplementedException();
+            
         }
 
 

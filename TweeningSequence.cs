@@ -121,6 +121,11 @@ namespace hjijijing.Tweening
             return markers.Contains(marker);
         }
 
+        public bool HasAnyMarkers()
+        {
+            return markers.Count != 0;
+        }
+
         public HashSet<string> GetMarkers()
         {
             return markers;
