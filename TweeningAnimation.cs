@@ -652,7 +652,7 @@ namespace hjijijing.Tweening
 
             return () => {
                 if (!HasMarker("_reverse", queueNumber)) return;
-                actionQueues.RemoveAt(reverseQueueNumber);
+                RemoveSequence(reverseQueueNumber);
 
                 for(int i = 0; i < reverseQueueNumber; i++)
                 {
@@ -660,8 +660,7 @@ namespace hjijijing.Tweening
                     TweeningSequence reverseSequence = sequence.GetReverse();
 
 
-
-                    actionQueues.Insert(reverseQueueNumber, reverseSequence);
+                    InsertSequence(reverseQueueNumber, reverseSequence);
                 }
 
                 //SetQueueNumber(queueNumber - 1);
@@ -703,9 +702,13 @@ namespace hjijijing.Tweening
             call(()=> {
                 Action<TweeningAnimation> actionToCall = condition(this) ? actionIfTrue : actionIfFalse;
 
-                float stamp = Process.GetCurrentProcess().StartTime;
+                int markerID = GetUniqueNumber();
 
-                then("#" + stamp)
+                then("#" + markerID);
+                then();
+                actionToCall(this);
+                then("#" + markerID + "end");
+                call(() => { });
             
             
             });
@@ -719,6 +722,111 @@ namespace hjijijing.Tweening
 
         #endregion
 
+
+
+        int uniqueNumber = 0;
+
+        int GetUniqueNumber()
+        {
+            return uniqueNumber++;
+        }
+
+        #region FindindSequences
+
+        public int GetMarkerQueueNumber(string marker)
+        {
+            for(int i = 0; i < actionQueues.Count; i++)
+            {
+                if (actionQueues[i].HasMarker(marker)) return i;
+            }
+
+            return -1;
+        }
+
+        public TweeningSequence GetSequenceInQueue(int queueNumber)
+        {
+            if (queueNumber < 0 || queueNumber >= actionQueues.Count) return null;
+            return actionQueues[queueNumber];
+        }
+
+        public TweeningSequence GetSequenceInQueue(string marker)
+        {
+            return GetSequenceInQueue(GetMarkerQueueNumber(marker));
+        }
+
+        public List<TweeningSequence> GetTweeningSequences(int queueNumberStartInclusive, int queueNumberEndInclusive)
+        {
+            queueNumberStartInclusive = Mathf.Clamp(queueNumberStartInclusive, 0, actionQueues.Count - 1);
+            queueNumberEndInclusive = Mathf.Clamp(queueNumberEndInclusive, 0, actionQueues.Count - 1);
+
+            List<TweeningSequence> result = new List<TweeningSequence>();
+
+            int sign = (int)Mathf.Sign(queueNumberEndInclusive - queueNumberStartInclusive);
+            for(int i = queueNumberStartInclusive; sign > 0 ? (i <= queueNumberEndInclusive) : (i >= queueNumberEndInclusive); i += sign)
+            {
+                result.Add(GetSequenceInQueue(i));
+            }
+
+            return result;
+        }
+
+        public List<TweeningSequence> GetTweeningSequences(string markerFrom, string markerTo)
+        {
+            return GetTweeningSequences(GetMarkerQueueNumber(markerFrom), GetMarkerQueueNumber(markerTo));
+        }
+
+        #endregion
+
+        #region Removing and Inserting Sequences
+
+        public void RemoveSequence(TweeningSequence sequence)
+        {
+            actionQueues.Remove(sequence);
+        }
+
+        public void RemoveSequence(string marker)
+        {
+            TweeningSequence sequence = GetSequenceInQueue(marker);
+            RemoveSequence(sequence);
+        }
+
+        public void RemoveSequence(int queueNumber)
+        {
+            TweeningSequence sequence = GetSequenceInQueue(queueNumber);
+            RemoveSequence(sequence);
+        }
+
+        public void RemoveSequences(List<TweeningSequence> sequences)
+        {
+            foreach(TweeningSequence sequence in sequences)
+            {
+                RemoveSequence(sequence);
+            }
+        }
+
+        public void RemoveSequences(int queueNumberStartInclusive, int queueNumberEndInclusive)
+        {
+            RemoveSequences(GetTweeningSequences(queueNumberStartInclusive, queueNumberEndInclusive));
+        }
+
+        public void RemoveSequences(string markerFrom, string markerTo)
+        {
+            RemoveSequences(GetTweeningSequences(markerFrom, markerTo));
+        }
+
+
+        public void InsertSequence(int queueNumber, TweeningSequence sequence)
+        {
+            actionQueues.Insert(queueNumber, sequence);
+        }
+
+        public void InsertSequence(string marker, TweeningSequence sequence)
+        {
+            actionQueues.Insert(GetMarkerQueueNumber(marker), sequence);
+        }
+
+
+        #endregion
 
 
     }
