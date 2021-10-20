@@ -704,13 +704,17 @@ namespace hjijijing.Tweening
 
                 int markerID = GetUniqueNumber();
 
-                then("#" + markerID);
+                string markerStart = "#" + markerID;
+                string markerEnd = markerStart + "end";
+
+                then(markerStart);
                 then();
                 actionToCall(this);
-                then("#" + markerID + "end");
-                call(() => { });
+                then(markerEnd);
+                call(() => { RemoveSequences(markerStart, markerEnd); });
             
-            
+
+
             });
 
             then();
