@@ -850,14 +850,12 @@ namespace hjijijing.Tweening
 
         public TweeningAnimation Branch(Func<TweeningAnimation, bool> condition, Action<TweeningAnimation> actionIfTrue, Action<TweeningAnimation> actionIfFalse)
         {
-            
-            int queueNumber = this.queueNumber;
-
             then();
 
             
 
             call(()=> {
+                int queueNumber = this.queueNumber;
                 Action<TweeningAnimation> actionToCall = condition(this) ? actionIfTrue : actionIfFalse;
 
                 int markerID = GetUniqueNumber();
