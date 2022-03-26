@@ -243,6 +243,26 @@ namespace hjijijing.Tweening
             return this;
         }
 
+        public TweeningAnimation from<T>(T startValue)
+        {
+            if (!builder.IsEmpty())
+            {
+                builder.SetStartValueLatest(startValue);
+                return this;
+            }
+
+            if (actionQueues.Count == 0) return this;
+
+            for (int i = actionQueues.Count - 1; i > -1; i++)
+            {
+                if (actionQueues[i].IsEmpty()) continue;
+                actionQueues[i].SetStartValueLatest(startValue);
+                return this;
+            }
+
+            return this;
+        }
+
         /// <summary>
         /// Sets the easing function for all actions currently in the builder, that support easing.
         /// </summary>
@@ -340,6 +360,37 @@ namespace hjijijing.Tweening
             return this;
         }
 
+        /// <summary>
+        /// Adds a movement action that moves the animation's gameobject to the specified end position from the speicifed start poistion.
+        /// </summary>
+        /// <param name="startPosition">The start position</param>
+        /// <param name="targetPosition">The position to move to</param>
+        /// <param name="duration">Duration for the movement</param>
+        /// <param name="startDelay">Delay before the movement starts. Default is 0</param>
+        /// <param name="endDelay">Delay after the movement is done, before it is marked as finished. Default is 0</param>
+        public TweeningAnimation move(Vector3 startPosition, Vector3 targetPosition, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return move(gameObject, startPosition, targetPosition, duration, startDelay, endDelay);
+        }
+
+
+        /// <summary>
+        /// Adds a movement action that moves the specified gameobject from the specified start poisition to the specified end position.
+        /// </summary>
+        /// <param name="gameObject">The GameObject to move</param>
+        /// <param name="startPosition">The start position</param>
+        /// <param name="targetPosition">The position to move to</param>
+        /// <param name="duration">Duration for the movement</param>
+        /// <param name="startDelay">Delay before the movement starts. Default is 0</param>
+        /// <param name="endDelay">Delay after the movement is done, before it is marked as finished. Default is 0</param>
+        public TweeningAnimation move(GameObject gameObject, Vector3 startPosition, Vector3 targetPosition, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            move(gameObject, targetPosition, duration, startDelay, endDelay);
+            return from(startPosition);
+        }
+
+        
+
 
         /// <summary>
         /// Adds a color change action that changes the animation's gameobject to the specified color.
@@ -370,6 +421,35 @@ namespace hjijijing.Tweening
 
             AddActionToBuilder(action);
             return this;
+        }
+
+        /// <summary>
+        /// Adds a color change action that changes the animation's gameobject to the specified color.
+        /// </summary>
+        /// <param name="startColor">The color to change from</param>
+        /// <param name="targetColor">The color to change to</param>
+        /// <param name="duration">Duration for the change</param>
+        /// <param name="startDelay">Delay before the change starts. Default is 0</param>
+        /// <param name="endDelay">Delay after the change is done, before it is marked as finished. Default is 0</param>
+        public TweeningAnimation colorMesh(Color startColor, Color targetColor, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return (colorMesh(gameObject, startColor, targetColor, duration, startDelay, endDelay));
+        }
+
+        /// <summary>
+        /// Adds a color change action that changes the specified gameobject to the specified color from the specified start color.
+        /// </summary>
+        /// <param name="gameObject">The GameObject whose color will be changed</param>
+        /// <param name="startColor">The color to change from</param>
+        /// <param name="targetColor">The color to change to</param>
+        /// <param name="duration">Duration for the change</param>
+        /// <param name="startDelay">Delay before the change starts. Default is 0</param>
+        /// <param name="endDelay">Delay after the change is done, before it is marked as finished. Default is 0</param>
+        /// <returns></returns>
+        public TweeningAnimation colorMesh(GameObject gameObject, Color startColor, Color targetColor, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            colorMesh(gameObject, targetColor, duration, startDelay, endDelay);
+            return from(startColor);
         }
 
         /// <summary>
@@ -404,6 +484,43 @@ namespace hjijijing.Tweening
         }
 
         /// <summary>
+        /// Adds a rotation action that rotates the animation's gameobject to the specified rotation from the specified start rotation.
+        /// </summary>
+        /// <param name="startRotation">The rotation to rotate from</param>
+        /// <param name="targetRotation">The rotation to rotate to</param>
+        /// <param name="duration">Duration for the rotation</param>
+        /// <param name="startDelay">Delay before the rotation starts. Default is 0</param>
+        /// <param name="endDelay">Delay after the rotation is done, before it is marked as finished. Default is 0</param>
+        /// <returns></returns>
+        public TweeningAnimation rotate(Quaternion startRotation, Quaternion targetRotation, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return rotate(gameObject, startRotation, targetRotation, duration, startDelay, endDelay);
+        }
+
+        /// <summary>
+        /// Adds a rotation action that rotates the specified gameobject to the specified rotation from the specified start rotation.
+        /// </summary>
+        /// <param name="gameObject">The gameobject to rotate.</param>
+        /// <param name="startRotation">The rotation to rotate from</param>
+        /// <param name="targetRotation">The rotation to rotate to</param>
+        /// <param name="duration">Duration for the rotation</param>
+        /// <param name="startDelay">Delay before the rotation starts. Default is 0</param>
+        /// <param name="endDelay">Delay after the rotation is done, before it is marked as finished. Default is 0</param>
+        /// <returns></returns>
+        public TweeningAnimation rotate(GameObject gameObject, Quaternion startRotation, Quaternion targetRotation, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            rotate(gameObject, targetRotation, duration, startDelay, endDelay);
+            return from(startRotation);
+        }
+
+
+
+
+
+
+
+
+        /// <summary>
         /// Adds a scale action that scales the animation's gameobject to the specified scale.
         /// </summary>
         /// <param name="targetScale">The scale to scale to</param>
@@ -435,6 +552,44 @@ namespace hjijijing.Tweening
             AddActionToBuilder(action);
             return this;
         }
+
+
+
+        /// <summary>
+        /// Adds a scale action that scales the animation's gameobject to the specified scale from the specified start scale.
+        /// </summary>
+        /// <param name="startScale">The scale to scale from</param>
+        /// <param name="targetScale">The scale to scale to</param>
+        /// <param name="duration">Duration for the scaling</param>
+        /// <param name="startDelay">Delay before the scaling starts. Default is 0</param>
+        /// <param name="endDelay">Delay after the scaling is done, before it is marked as finished. Default is 0</param>
+        /// <returns></returns>
+        public TweeningAnimation scale(Vector3 startScale, Vector3 targetScale, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return scale(gameObject, startScale, targetScale, duration, startDelay, endDelay);
+        }
+
+
+
+        /// <summary>
+        /// Adds a scale action that scales the specified gameobject to the specified scale from the specified start scale.
+        /// </summary>
+        /// <param name="gameObject">The game object to scale.</param>
+        /// <param name="startScale">The scale to scale from</param>
+        /// <param name="targetScale">The scale to scale to</param>
+        /// <param name="duration">Duration for the scaling</param>
+        /// <param name="startDelay">Delay before the scaling starts. Default is 0</param>
+        /// <param name="endDelay">Delay after the scaling is done, before it is marked as finished. Default is 0</param>
+        public TweeningAnimation scale(GameObject gameObject, Vector3 startScale, Vector3 targetScale, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            scale(gameObject, targetScale, duration, startDelay, endDelay);
+            return from(startScale);
+        }
+
+
+
+
+
 
         /// <summary>
         /// Adds a vector3 callback animation that calls the given callback function every frame with the current value.

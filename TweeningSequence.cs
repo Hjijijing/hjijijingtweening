@@ -77,6 +77,16 @@ namespace hjijijing.Tweening
             action.easing = easing;
         }
 
+        public void SetStartValueLatest<T>(T startValue)
+        {
+            if (latestBuildAction == null) return;
+            if (!(latestBuildAction is AnimationTweeningAction<T>)) return;
+
+            AnimationTweeningAction<T> action = (AnimationTweeningAction<T>)latestBuildAction;
+
+            action.SetStartValue(startValue);
+        }
+
 
         public new void Add(ITweeningAction action)
         {

@@ -20,6 +20,7 @@ namespace hjijijing.Tweening
         public float startDelay = 0f;
         public float endDelay = 0f;
         public T startValue;
+        public bool startDetermined = false;
         public T endValue;
 
         public GameObject gameObject;
@@ -69,7 +70,14 @@ namespace hjijijing.Tweening
             coroutine = mono.StartCoroutine(execute(onDone));
         }
 
-        public abstract void setStartValue();
+        public abstract void findStartValue();
+
+
+        public void SetStartValue(T start)
+        {
+            startValue = start;
+            startDetermined = true;
+        }
 
 
         public abstract void modifyGameObject(float time);
@@ -80,8 +88,8 @@ namespace hjijijing.Tweening
             if (startDelay > 0f)
                 yield return new WaitForSeconds(startDelay);
 
-
-            setStartValue();
+            if(!startDetermined)
+            findStartValue();
             modifyGameObject(0f);
 
             yield return null;

@@ -24,7 +24,7 @@ namespace hjijijing.Tweening
 
         }
 
-        public override void setStartValue()
+        public override void findStartValue()
         {
             MeshRenderer mr = gameObject.GetComponent<MeshRenderer>();
             if (mr == null) return;

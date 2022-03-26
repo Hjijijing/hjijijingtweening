@@ -21,7 +21,7 @@ namespace hjijijing.Tweening
             gameObject.transform.localScale = Vector3.LerpUnclamped(startValue, endValue, time);
         }
 
-        public override void setStartValue()
+        public override void findStartValue()
         {
             startValue = gameObject.transform.localScale;
         }

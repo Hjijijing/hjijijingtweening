@@ -21,7 +21,7 @@ namespace hjijijing.Tweening
         { 
         }
 
-        public override void setStartValue()
+        public override void findStartValue()
         {
         }
     }
