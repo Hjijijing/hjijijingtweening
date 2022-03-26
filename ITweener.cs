@@ -10,6 +10,12 @@ namespace hjijijing.Tweening
     public interface ITweener
     {
 
+        bool forceOneAtEnd
+        {
+            get;
+            set;
+        }
+
         void Stop();
 
         void forceFinish();

@@ -247,7 +247,7 @@ namespace hjijijing.Tweening
 
         public static Func<float, float> reverseEasing(Func<float, float> easing)
         {
-            return (t) => { return -easing(t); };
+            return (t) => { return 1-easing(t); };
         }
 
         public static Func<float, float> combineEasings(Func<float, float> easing1, Func<float, float> easing2, float transitionPoint = 0.5f)

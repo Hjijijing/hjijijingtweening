@@ -77,6 +77,39 @@ namespace hjijijing.Tweening
             action.easing = easing;
         }
 
+
+        public void SetReturnBackLatest(float transitionPoint)
+        {
+            if (latestBuildAction == null) return;
+            if (!(latestBuildAction is ITweener)) return;
+
+            ITweener action = (ITweener)latestBuildAction;
+
+            Func<float, float> easing = action.easing;
+
+            Func<float, float> newEasing = Easing.combineEasings(easing, Easing.reverseEasing(easing), transitionPoint);
+
+            action.easing = newEasing;
+
+            action.forceOneAtEnd = false;
+        }
+
+        public void SetReturnBackLatest(Func<float, float> returnEasing, float transitionPoint)
+        {
+            if (latestBuildAction == null) return;
+            if (!(latestBuildAction is ITweener)) return;
+
+            ITweener action = (ITweener)latestBuildAction;
+
+            Func<float, float> easing = action.easing;
+
+            Func<float, float> newEasing = Easing.combineEasings(easing, Easing.reverseEasing(returnEasing), transitionPoint);
+
+            action.easing = newEasing;
+
+            action.forceOneAtEnd = false;
+        }
+
         public void SetStartValueLatest<T>(T startValue)
         {
             if (latestBuildAction == null) return;

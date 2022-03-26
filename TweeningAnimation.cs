@@ -243,6 +243,64 @@ namespace hjijijing.Tweening
             return this;
         }
 
+
+        /// <summary>
+        /// Makes the latest action tween to target point and then back by combining the easing with its reverse easing.
+        /// </summary>
+        /// <param name="transitionPoint">The percentage point at which the action will reach the target point and begin to go back</param>
+        /// <returns></returns>
+        public TweeningAnimation ReturnBack(float transitionPoint = 0.5f)
+        {
+            if (!builder.IsEmpty())
+            {
+                builder.SetReturnBackLatest(transitionPoint);
+                return this;
+            }
+
+            if (actionQueues.Count == 0) return this;
+
+            for (int i = actionQueues.Count - 1; i > -1; i++)
+            {
+                if (actionQueues[i].IsEmpty()) continue;
+                actionQueues[i].SetReturnBackLatest(transitionPoint);
+                return this;
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Makes the latest action tween to target point and then back by combining the easing with the specified easing.
+        /// </summary>
+        /// <param name="returnEasing">The easing to return with</param>
+        /// <param name="transitionPoint">The percentage point at which the action will reach the target point and begin to go back</param>
+        /// <returns></returns>
+        public TweeningAnimation ReturnBack(Func<float,float> returnEasing, float transitionPoint = 0.5f)
+        {
+            if (!builder.IsEmpty())
+            {
+                builder.SetReturnBackLatest(returnEasing,transitionPoint);
+                return this;
+            }
+
+            if (actionQueues.Count == 0) return this;
+
+            for (int i = actionQueues.Count - 1; i > -1; i++)
+            {
+                if (actionQueues[i].IsEmpty()) continue;
+                actionQueues[i].SetReturnBackLatest(returnEasing, transitionPoint);
+                return this;
+            }
+
+            return this;
+        }
+
+
+        /// <summary>
+        /// Sets the start value of the latest action.
+        /// </summary>
+        /// <param name="startValue">The start value</param>
+        /// <returns></returns>
         public TweeningAnimation from<T>(T startValue)
         {
             if (!builder.IsEmpty())

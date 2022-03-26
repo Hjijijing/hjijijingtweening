@@ -16,12 +16,20 @@ namespace hjijijing.Tweening
         public Func<float, float> easing { get; set; } = Easing.linear;
 
 
+
+        
+        public bool forceOneAtEnd { get; set; }
+        
+
         public float duration;
         public float startDelay = 0f;
         public float endDelay = 0f;
         public T startValue;
         public bool startDetermined = false;
         public T endValue;
+
+
+        
 
         public GameObject gameObject;
 
@@ -101,7 +109,7 @@ namespace hjijijing.Tweening
             }
 
 
-            modifyGameObject(1f);
+            modifyGameObject(forceOneAtEnd ? 1f : easing(1f));
 
             if (endDelay > 0f)
                 yield return new WaitForSeconds(endDelay);
