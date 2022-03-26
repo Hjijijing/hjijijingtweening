@@ -78,6 +78,49 @@ namespace hjijijing.Tweening
         }
 
 
+        public void SetReturnBackLatest(float transitionPoint)
+        {
+            if (latestBuildAction == null) return;
+            if (!(latestBuildAction is ITweener)) return;
+
+            ITweener action = (ITweener)latestBuildAction;
+
+            Func<float, float> easing = action.easing;
+
+            Func<float, float> newEasing = Easing.combineEasings(easing, Easing.reverseEasing(easing), transitionPoint);
+
+            action.easing = newEasing;
+
+            action.forceOneAtEnd = false;
+        }
+
+        public void SetReturnBackLatest(Func<float, float> returnEasing, float transitionPoint)
+        {
+            if (latestBuildAction == null) return;
+            if (!(latestBuildAction is ITweener)) return;
+
+            ITweener action = (ITweener)latestBuildAction;
+
+            Func<float, float> easing = action.easing;
+
+            Func<float, float> newEasing = Easing.combineEasings(easing, Easing.reverseEasing(returnEasing), transitionPoint);
+
+            action.easing = newEasing;
+
+            action.forceOneAtEnd = false;
+        }
+
+        public void SetStartValueLatest<T>(T startValue)
+        {
+            if (latestBuildAction == null) return;
+            if (!(latestBuildAction is AnimationTweeningAction<T>)) return;
+
+            AnimationTweeningAction<T> action = (AnimationTweeningAction<T>)latestBuildAction;
+
+            action.SetStartValue(startValue);
+        }
+
+
         public new void Add(ITweeningAction action)
         {
             base.Add(action);
@@ -119,6 +162,11 @@ namespace hjijijing.Tweening
         public bool HasMarker(string marker)
         {
             return markers.Contains(marker);
+        }
+
+        public bool HasAnyMarkers()
+        {
+            return markers.Count != 0;
         }
 
         public HashSet<string> GetMarkers()

@@ -245,7 +245,21 @@ namespace hjijijing.Tweening
             return (t) => { return t == 0f ? 0f : t == 1f ? 1f : UnityEngine.Random.Range(min, max); };
         }
 
+        public static Func<float, float> reverseEasing(Func<float, float> easing)
+        {
+            return (t) => { return 1-easing(t); };
+        }
 
+        public static Func<float, float> combineEasings(Func<float, float> easing1, Func<float, float> easing2, float transitionPoint = 0.5f)
+        {
+            return (t) =>
+            {
+                if (t <= transitionPoint)
+                    return easing1(t / transitionPoint);
+                else
+                    return easing2((t - transitionPoint)/(1 - transitionPoint));
+            };
+        }
     }
 
 }

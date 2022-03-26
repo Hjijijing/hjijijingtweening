@@ -23,7 +23,7 @@ namespace hjijijing.Tweening
 
 
 
-        public override void setStartValue()
+        public override void findStartValue()
         {
             return; //Start value is already set in constructor
         }

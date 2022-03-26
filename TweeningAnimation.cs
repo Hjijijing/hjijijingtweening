@@ -107,8 +107,8 @@ namespace hjijijing.Tweening
         /// </summary>
         protected void commitBuilder()
         {
-            if (builder.Count != 0)
-                actionQueues.Add(builder);
+            if (builder.Count == 0 && !builder.HasAnyMarkers()) return;
+            actionQueues.Add(builder);
             builder = new TweeningSequence();
         }
 
@@ -243,6 +243,84 @@ namespace hjijijing.Tweening
             return this;
         }
 
+
+        /// <summary>
+        /// Makes the latest action tween to target point and then back by combining the easing with its reverse easing.
+        /// </summary>
+        /// <param name="transitionPoint">The percentage point at which the action will reach the target point and begin to go back</param>
+        /// <returns></returns>
+        public TweeningAnimation ReturnBack(float transitionPoint = 0.5f)
+        {
+            if (!builder.IsEmpty())
+            {
+                builder.SetReturnBackLatest(transitionPoint);
+                return this;
+            }
+
+            if (actionQueues.Count == 0) return this;
+
+            for (int i = actionQueues.Count - 1; i > -1; i++)
+            {
+                if (actionQueues[i].IsEmpty()) continue;
+                actionQueues[i].SetReturnBackLatest(transitionPoint);
+                return this;
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Makes the latest action tween to target point and then back by combining the easing with the specified easing.
+        /// </summary>
+        /// <param name="returnEasing">The easing to return with</param>
+        /// <param name="transitionPoint">The percentage point at which the action will reach the target point and begin to go back</param>
+        /// <returns></returns>
+        public TweeningAnimation ReturnBack(Func<float,float> returnEasing, float transitionPoint = 0.5f)
+        {
+            if (!builder.IsEmpty())
+            {
+                builder.SetReturnBackLatest(returnEasing,transitionPoint);
+                return this;
+            }
+
+            if (actionQueues.Count == 0) return this;
+
+            for (int i = actionQueues.Count - 1; i > -1; i++)
+            {
+                if (actionQueues[i].IsEmpty()) continue;
+                actionQueues[i].SetReturnBackLatest(returnEasing, transitionPoint);
+                return this;
+            }
+
+            return this;
+        }
+
+
+        /// <summary>
+        /// Sets the start value of the latest action.
+        /// </summary>
+        /// <param name="startValue">The start value</param>
+        /// <returns></returns>
+        public TweeningAnimation from<T>(T startValue)
+        {
+            if (!builder.IsEmpty())
+            {
+                builder.SetStartValueLatest(startValue);
+                return this;
+            }
+
+            if (actionQueues.Count == 0) return this;
+
+            for (int i = actionQueues.Count - 1; i > -1; i++)
+            {
+                if (actionQueues[i].IsEmpty()) continue;
+                actionQueues[i].SetStartValueLatest(startValue);
+                return this;
+            }
+
+            return this;
+        }
+
         /// <summary>
         /// Sets the easing function for all actions currently in the builder, that support easing.
         /// </summary>
@@ -340,6 +418,37 @@ namespace hjijijing.Tweening
             return this;
         }
 
+        /// <summary>
+        /// Adds a movement action that moves the animation's gameobject to the specified end position from the speicifed start poistion.
+        /// </summary>
+        /// <param name="startPosition">The start position</param>
+        /// <param name="targetPosition">The position to move to</param>
+        /// <param name="duration">Duration for the movement</param>
+        /// <param name="startDelay">Delay before the movement starts. Default is 0</param>
+        /// <param name="endDelay">Delay after the movement is done, before it is marked as finished. Default is 0</param>
+        public TweeningAnimation move(Vector3 startPosition, Vector3 targetPosition, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return move(gameObject, startPosition, targetPosition, duration, startDelay, endDelay);
+        }
+
+
+        /// <summary>
+        /// Adds a movement action that moves the specified gameobject from the specified start poisition to the specified end position.
+        /// </summary>
+        /// <param name="gameObject">The GameObject to move</param>
+        /// <param name="startPosition">The start position</param>
+        /// <param name="targetPosition">The position to move to</param>
+        /// <param name="duration">Duration for the movement</param>
+        /// <param name="startDelay">Delay before the movement starts. Default is 0</param>
+        /// <param name="endDelay">Delay after the movement is done, before it is marked as finished. Default is 0</param>
+        public TweeningAnimation move(GameObject gameObject, Vector3 startPosition, Vector3 targetPosition, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            move(gameObject, targetPosition, duration, startDelay, endDelay);
+            return from(startPosition);
+        }
+
+        
+
 
         /// <summary>
         /// Adds a color change action that changes the animation's gameobject to the specified color.
@@ -370,6 +479,35 @@ namespace hjijijing.Tweening
 
             AddActionToBuilder(action);
             return this;
+        }
+
+        /// <summary>
+        /// Adds a color change action that changes the animation's gameobject to the specified color.
+        /// </summary>
+        /// <param name="startColor">The color to change from</param>
+        /// <param name="targetColor">The color to change to</param>
+        /// <param name="duration">Duration for the change</param>
+        /// <param name="startDelay">Delay before the change starts. Default is 0</param>
+        /// <param name="endDelay">Delay after the change is done, before it is marked as finished. Default is 0</param>
+        public TweeningAnimation colorMesh(Color startColor, Color targetColor, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return (colorMesh(gameObject, startColor, targetColor, duration, startDelay, endDelay));
+        }
+
+        /// <summary>
+        /// Adds a color change action that changes the specified gameobject to the specified color from the specified start color.
+        /// </summary>
+        /// <param name="gameObject">The GameObject whose color will be changed</param>
+        /// <param name="startColor">The color to change from</param>
+        /// <param name="targetColor">The color to change to</param>
+        /// <param name="duration">Duration for the change</param>
+        /// <param name="startDelay">Delay before the change starts. Default is 0</param>
+        /// <param name="endDelay">Delay after the change is done, before it is marked as finished. Default is 0</param>
+        /// <returns></returns>
+        public TweeningAnimation colorMesh(GameObject gameObject, Color startColor, Color targetColor, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            colorMesh(gameObject, targetColor, duration, startDelay, endDelay);
+            return from(startColor);
         }
 
         /// <summary>
@@ -404,6 +542,43 @@ namespace hjijijing.Tweening
         }
 
         /// <summary>
+        /// Adds a rotation action that rotates the animation's gameobject to the specified rotation from the specified start rotation.
+        /// </summary>
+        /// <param name="startRotation">The rotation to rotate from</param>
+        /// <param name="targetRotation">The rotation to rotate to</param>
+        /// <param name="duration">Duration for the rotation</param>
+        /// <param name="startDelay">Delay before the rotation starts. Default is 0</param>
+        /// <param name="endDelay">Delay after the rotation is done, before it is marked as finished. Default is 0</param>
+        /// <returns></returns>
+        public TweeningAnimation rotate(Quaternion startRotation, Quaternion targetRotation, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return rotate(gameObject, startRotation, targetRotation, duration, startDelay, endDelay);
+        }
+
+        /// <summary>
+        /// Adds a rotation action that rotates the specified gameobject to the specified rotation from the specified start rotation.
+        /// </summary>
+        /// <param name="gameObject">The gameobject to rotate.</param>
+        /// <param name="startRotation">The rotation to rotate from</param>
+        /// <param name="targetRotation">The rotation to rotate to</param>
+        /// <param name="duration">Duration for the rotation</param>
+        /// <param name="startDelay">Delay before the rotation starts. Default is 0</param>
+        /// <param name="endDelay">Delay after the rotation is done, before it is marked as finished. Default is 0</param>
+        /// <returns></returns>
+        public TweeningAnimation rotate(GameObject gameObject, Quaternion startRotation, Quaternion targetRotation, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            rotate(gameObject, targetRotation, duration, startDelay, endDelay);
+            return from(startRotation);
+        }
+
+
+
+
+
+
+
+
+        /// <summary>
         /// Adds a scale action that scales the animation's gameobject to the specified scale.
         /// </summary>
         /// <param name="targetScale">The scale to scale to</param>
@@ -435,6 +610,44 @@ namespace hjijijing.Tweening
             AddActionToBuilder(action);
             return this;
         }
+
+
+
+        /// <summary>
+        /// Adds a scale action that scales the animation's gameobject to the specified scale from the specified start scale.
+        /// </summary>
+        /// <param name="startScale">The scale to scale from</param>
+        /// <param name="targetScale">The scale to scale to</param>
+        /// <param name="duration">Duration for the scaling</param>
+        /// <param name="startDelay">Delay before the scaling starts. Default is 0</param>
+        /// <param name="endDelay">Delay after the scaling is done, before it is marked as finished. Default is 0</param>
+        /// <returns></returns>
+        public TweeningAnimation scale(Vector3 startScale, Vector3 targetScale, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return scale(gameObject, startScale, targetScale, duration, startDelay, endDelay);
+        }
+
+
+
+        /// <summary>
+        /// Adds a scale action that scales the specified gameobject to the specified scale from the specified start scale.
+        /// </summary>
+        /// <param name="gameObject">The game object to scale.</param>
+        /// <param name="startScale">The scale to scale from</param>
+        /// <param name="targetScale">The scale to scale to</param>
+        /// <param name="duration">Duration for the scaling</param>
+        /// <param name="startDelay">Delay before the scaling starts. Default is 0</param>
+        /// <param name="endDelay">Delay after the scaling is done, before it is marked as finished. Default is 0</param>
+        public TweeningAnimation scale(GameObject gameObject, Vector3 startScale, Vector3 targetScale, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            scale(gameObject, targetScale, duration, startDelay, endDelay);
+            return from(startScale);
+        }
+
+
+
+
+
 
         /// <summary>
         /// Adds a vector3 callback animation that calls the given callback function every frame with the current value.
@@ -652,7 +865,7 @@ namespace hjijijing.Tweening
 
             return () => {
                 if (!HasMarker("_reverse", queueNumber)) return;
-                actionQueues.RemoveAt(reverseQueueNumber);
+                RemoveSequence(reverseQueueNumber);
 
                 for(int i = 0; i < reverseQueueNumber; i++)
                 {
@@ -660,8 +873,7 @@ namespace hjijijing.Tweening
                     TweeningSequence reverseSequence = sequence.GetReverse();
 
 
-
-                    actionQueues.Insert(reverseQueueNumber, reverseSequence);
+                    InsertSequence(reverseQueueNumber, reverseSequence);
                 }
 
                 //SetQueueNumber(queueNumber - 1);
@@ -691,6 +903,154 @@ namespace hjijijing.Tweening
 
 
         #endregion
+
+        #region Branching
+
+        public TweeningAnimation Branch(Func<TweeningAnimation, bool> condition, Action<TweeningAnimation> actionIfTrue, Action<TweeningAnimation> actionIfFalse)
+        {
+            then();
+
+            
+
+            call(()=> {
+                int queueNumber = this.queueNumber;
+                Action<TweeningAnimation> actionToCall = condition(this) ? actionIfTrue : actionIfFalse;
+
+                int markerID = GetUniqueNumber();
+                string marker = "#" + markerID;
+                string markerStart = marker + "start";
+                string markerEnd = marker + "end";
+
+
+
+                then(markerStart);
+                then();
+                actionToCall(this);
+                then(markerEnd);
+                call(() => {RemoveSequences(markerStart, markerEnd); SetQueueNumber(queueNumber); });
+                then();
+
+                int markerQueueNumber = GetMarkerQueueNumber(markerStart);
+
+
+                SetQueueNumber(markerQueueNumber - 1);
+            });
+
+            return then();
+
+            
+        }
+
+
+
+        #endregion
+
+
+
+        int uniqueNumber = 0;
+
+        int GetUniqueNumber()
+        {
+            return uniqueNumber++;
+        }
+
+        #region FindindSequences
+
+        public int GetMarkerQueueNumber(string marker)
+        {
+            for(int i = 0; i < actionQueues.Count; i++)
+            {
+                if (actionQueues[i].HasMarker(marker)) return i;
+            }
+
+            return -1;
+        }
+
+        public TweeningSequence GetSequenceInQueue(int queueNumber)
+        {
+            if (queueNumber < 0 || queueNumber >= actionQueues.Count) return null;
+            return actionQueues[queueNumber];
+        }
+
+        public TweeningSequence GetSequenceInQueue(string marker)
+        {
+            return GetSequenceInQueue(GetMarkerQueueNumber(marker));
+        }
+
+        public List<TweeningSequence> GetTweeningSequences(int queueNumberStartInclusive, int queueNumberEndInclusive)
+        {
+            queueNumberStartInclusive = Mathf.Clamp(queueNumberStartInclusive, 0, actionQueues.Count - 1);
+            queueNumberEndInclusive = Mathf.Clamp(queueNumberEndInclusive, 0, actionQueues.Count - 1);
+
+            List<TweeningSequence> result = new List<TweeningSequence>();
+
+            int sign = (int)Mathf.Sign(queueNumberEndInclusive - queueNumberStartInclusive);
+            for(int i = queueNumberStartInclusive; sign > 0 ? (i <= queueNumberEndInclusive) : (i >= queueNumberEndInclusive); i += sign)
+            {
+                result.Add(GetSequenceInQueue(i));
+            }
+
+            return result;
+        }
+
+        public List<TweeningSequence> GetTweeningSequences(string markerFrom, string markerTo)
+        {
+            return GetTweeningSequences(GetMarkerQueueNumber(markerFrom), GetMarkerQueueNumber(markerTo));
+        }
+
+        #endregion
+
+        #region Removing and Inserting Sequences
+
+        public void RemoveSequence(TweeningSequence sequence)
+        {
+            actionQueues.Remove(sequence);
+        }
+
+        public void RemoveSequence(string marker)
+        {
+            TweeningSequence sequence = GetSequenceInQueue(marker);
+            RemoveSequence(sequence);
+        }
+
+        public void RemoveSequence(int queueNumber)
+        {
+            TweeningSequence sequence = GetSequenceInQueue(queueNumber);
+            RemoveSequence(sequence);
+        }
+
+        public void RemoveSequences(List<TweeningSequence> sequences)
+        {
+            foreach(TweeningSequence sequence in sequences)
+            {
+                RemoveSequence(sequence);
+            }
+        }
+
+        public void RemoveSequences(int queueNumberStartInclusive, int queueNumberEndInclusive)
+        {
+            RemoveSequences(GetTweeningSequences(queueNumberStartInclusive, queueNumberEndInclusive));
+        }
+
+        public void RemoveSequences(string markerFrom, string markerTo)
+        {
+            RemoveSequences(GetTweeningSequences(markerFrom, markerTo));
+        }
+
+
+        public void InsertSequence(int queueNumber, TweeningSequence sequence)
+        {
+            actionQueues.Insert(queueNumber, sequence);
+        }
+
+        public void InsertSequence(string marker, TweeningSequence sequence)
+        {
+            actionQueues.Insert(GetMarkerQueueNumber(marker), sequence);
+        }
+
+
+        #endregion
+
 
     }
 

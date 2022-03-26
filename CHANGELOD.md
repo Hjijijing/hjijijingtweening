@@ -1,3 +1,11 @@
+# 1.0.10 - 26-03-2022
+### Added:
+- Branching. You can now create a branch action by calling Branch(). This function takes a condition function and two other functions as input. If the condition returns true then the first function will be called and the second function will be called otherwise.
+- Easing combining and Easing reversing. You can now called Easing.combineEasings() to combine to easings in to one. You can also call Easing.reverseEasing() to get an easing that is one minus the easing you put in.
+- TweeningAction now has a ReturnBack() function that will make the latest action go to the target point and then back instead of just stopping at the target point.
+- TweeningAction now has a function from() that specifies where the latest tweening action should start from. Furthermore rotate(), move(), colorMesh() and scale() all have a new overload where you can also pass a starting point.
+### Fixed:
+- Reversing seems to be working
 # 1.0.9 - 07-10-2021
 ### Fixed:
 - The new Sequence system now works.
