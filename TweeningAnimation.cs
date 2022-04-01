@@ -173,6 +173,16 @@ namespace hjijijing.Tweening
                 sequence.Revert();
             }
         }
+        
+        
+        /// <summary>
+        /// Reverts the changes done by the tweening animation and then calls cleanup.
+        /// <param name="cleanup">The cleanup action to call</param>
+        /// </summary>
+        public void revert(Action cleanup) {
+            revert();
+            cleanup?.Invoke();
+        }
 
 
         /// <summary>
