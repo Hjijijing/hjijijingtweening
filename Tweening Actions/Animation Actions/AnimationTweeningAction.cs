@@ -16,6 +16,13 @@ namespace hjijijing.Tweening
         public Func<float, float> easing { get; set; } = Easing.linear;
 
 
+        public delegate void AnimationTweeningEvent();
+        public AnimationTweeningEvent onTweenStarted;
+        public AnimationTweeningEvent onTweenEnded;
+        public AnimationTweeningEvent onTweenStopped;
+        public AnimationTweeningEvent onTweenForceFinished;
+        public AnimationTweeningEvent onTweenReverted;
+
 
         
         public bool forceOneAtEnd { get; set; }
@@ -51,18 +58,21 @@ namespace hjijijing.Tweening
         {
             if (coroutine == null) return;
             mono.StopCoroutine(coroutine);
+            onTweenStopped?.Invoke();
         }
 
         public void forceFinish()
         {
             Stop();
             modifyGameObject(1f);
+            onTweenForceFinished?.Invoke();
         }
 
         public void revert()
         {
             Stop();
             modifyGameObject(0f);
+            onTweenReverted?.Invoke();
         }
 
        /* public void reverse()
@@ -98,6 +108,8 @@ namespace hjijijing.Tweening
 
             if(!startDetermined)
             findStartValue();
+
+            onTweenStarted?.Invoke();
             modifyGameObject(0f);
 
             yield return null;
@@ -110,6 +122,7 @@ namespace hjijijing.Tweening
 
 
             modifyGameObject(forceOneAtEnd ? 1f : easing(1f));
+            onTweenEnded?.Invoke();
 
             if (endDelay > 0f)
                 yield return new WaitForSeconds(endDelay);

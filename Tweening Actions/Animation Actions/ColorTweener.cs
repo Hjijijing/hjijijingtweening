@@ -32,4 +32,30 @@ namespace hjijijing.Tweening
         }
     }
 
+    public class SpriteColorTweener : AnimationTweeningAction<Color>
+    {
+
+        public SpriteColorTweener(Action<ITweener> onDone, MonoBehaviour mono, GameObject gameObject, Color endValue, float duration, float startDelay = 0f, float endDelay = 0f) : base(onDone, mono, gameObject, endValue, duration, startDelay, endDelay) { }
+
+        public override ITweeningAction getReverse(Action<ITweener> onDone)
+        {
+            return new MeshColorTweener(onDone, mono, gameObject, startValue, duration, startDelay, endDelay);
+        }
+
+        public override void modifyGameObject(float time)
+        {
+            SpriteRenderer sr = gameObject.GetComponent<SpriteRenderer>();
+            if (sr == null) return;
+            sr.color = Color.LerpUnclamped(startValue, endValue, time);
+        }
+
+        public override void findStartValue()
+        {
+            SpriteRenderer sr = gameObject.GetComponent<SpriteRenderer>();
+            if (sr == null) return;
+            startValue = sr.color;
+        }
+
+    }
+
 }

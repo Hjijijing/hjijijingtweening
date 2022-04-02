@@ -797,11 +797,9 @@ namespace hjijijing.Tweening
         /// <returns></returns>
         public TweeningAnimation Wait(float duration)
         {
-            then();
             WaitForTime action = new WaitForTime(builder.tweenDone, source, gameObject, duration);
 
             AddActionToBuilder(action);
-            then();
 
             return this;
         }
