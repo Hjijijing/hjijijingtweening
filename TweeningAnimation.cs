@@ -8,6 +8,13 @@ namespace hjijijing.Tweening
 
     public class TweeningAnimation
     {
+        
+        
+        public delegate void AnimationDelegate();
+        public AnimationDelegate onRevert;
+        public AnimationDelegate onStart;
+        public AnimationDelegate onStop;
+        
 
         /// <summary>
         /// The source of the tweening animation. This is mainly used to access the StartCoroutine() function
@@ -94,6 +101,7 @@ namespace hjijijing.Tweening
         /// </summary>
         public void Start()
         {
+            onStart?.Invoke();
             if (builder.Count != 0)
             {
                 commitBuilder();
@@ -144,6 +152,7 @@ namespace hjijijing.Tweening
         {
             if (currentPlayingSequence == null) return;
             currentPlayingSequence.StopSequence();
+            onStop?.Invoke();
         }
 
         /// <summary>
@@ -172,6 +181,18 @@ namespace hjijijing.Tweening
 
                 sequence.Revert();
             }
+            
+            onRevert?.Invoke();
+        }
+        
+        
+        /// <summary>
+        /// Reverts the changes done by the tweening animation and then calls cleanup.
+        /// <param name="cleanup">The cleanup action to call</param>
+        /// </summary>
+        public void revert(Action cleanup) {
+            revert();
+            cleanup?.Invoke();
         }
 
 
