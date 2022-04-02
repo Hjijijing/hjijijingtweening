@@ -109,10 +109,12 @@ namespace hjijijing.Tweening
             if (startDelay > 0f)
                 yield return new WaitForSeconds(startDelay);
 
+            onTweenStarted?.Invoke(this);
+
             if(!startDetermined)
             findStartValue();
 
-            onTweenStarted?.Invoke(this);
+            
             modifyGameObject(0f);
 
             yield return null;

@@ -14,6 +14,8 @@ namespace hjijijing.Tweening
         public AnimationDelegate onRevert;
         public AnimationDelegate onStart;
         public AnimationDelegate onStop;
+        public AnimationDelegate onForceFinish;
+        public AnimationDelegate onEnded;
         
 
         /// <summary>
@@ -128,7 +130,9 @@ namespace hjijijing.Tweening
             if(currentPlayingSequence != null)
                 currentPlayingSequence.onTweenSequenceDone -= StartNextQueue;
 
-            if (queueNumber >= actionQueues.Count) return;
+            if (queueNumber >= actionQueues.Count) {
+                onEnded?.Invoke();
+                return; }
 
             TweeningSequence sequence = actionQueues[queueNumber];
             currentPlayingSequence = sequence;
@@ -166,6 +170,8 @@ namespace hjijijing.Tweening
 
                 sequence.ForceFinish();
             }
+
+            onForceFinish?.Invoke();
         }
 
         /// <summary>
@@ -342,6 +348,61 @@ namespace hjijijing.Tweening
             return this;
         }
 
+
+        public TweeningAnimation from<T>(Func<T> callback)
+        {
+            return from(callback, out Action c);
+        }
+
+        public TweeningAnimation from<T>(Func<T> callback, out Action cleanup)
+        {
+            Action<AnimationTweeningAction> function = (action) =>
+            {
+                if (!TryGetAnimationTweeningAction<T>(action, out var animAction)) return;
+                animAction.SetStartValue(callback());
+            };
+
+            CallOnActionStart(function, out Action c);
+
+            cleanup = c;
+            return this;
+        }
+
+
+        public TweeningAnimation to<T>(T value)
+        {
+            if (!TryGetLatestAddedActionAsAnimationTweeningAction<T>(out var action)) return this;
+            action.endValue = value;
+            return this;
+        }
+
+
+        public TweeningAnimation to<T>(Func<T> callback)
+        {
+            return to(callback, out Action c);
+        }
+
+        public TweeningAnimation to<T>(Func<T> callback, out Action cleanup)
+        {
+            Action<AnimationTweeningAction> function = (action) =>
+            {
+                if (!TryGetAnimationTweeningAction<T>(action, out var animAction)) return;
+                animAction.endValue = callback();
+            };
+
+            CallOnActionStart(function, out Action c1);
+            CallOnActionStopped(function, out Action c2);
+
+            cleanup = () => { c1(); c2(); };
+            return this;
+        }
+
+
+
+
+
+
+
         /// <summary>
         /// Sets the easing function for all actions currently in the builder, that support easing.
         /// </summary>
@@ -427,7 +488,7 @@ namespace hjijijing.Tweening
         {
             AnimationTweeningAction latest = GetLatestAddedActionAsAnimationTweeningAction();
             action = latest;
-            return latest == null;
+            return latest != null;
         }
 
         public AnimationTweeningAction<T> GetLatestAddedActionAsAnimationTweeningAction<T>()
@@ -442,7 +503,7 @@ namespace hjijijing.Tweening
         {
             AnimationTweeningAction<T> latest = GetLatestAddedActionAsAnimationTweeningAction<T>();
             action = latest;
-            return latest == null;
+            return latest != null;
         }
 
         public TweeningAnimation ForceOne(bool force = true)
@@ -567,22 +628,26 @@ namespace hjijijing.Tweening
         #endregion
 
 
-        public TweeningAnimation StartValueCallback<T>(Func<T> callback, out Action c)
-        {
-            CallOnActionStart((action) => {
-                if (!TryGetAnimationTweeningAction<T>(action, out var animAction)) return;
-                animAction.SetStartValue(callback());
-            }, out Action cleanup);
 
-            c = cleanup;
-            return this;
-        }
 
 
         #region Tweeners
 
 
         #region Position
+        public TweeningAnimation move(float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return move(gameObject, duration, startDelay, endDelay);
+        }
+
+        public TweeningAnimation move(GameObject gameObject, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return move(gameObject, Vector3.zero, duration, startDelay, endDelay);
+        }
+
+
+
+
         /// <summary>
         /// Adds a movement action that moves the animation's gameobject to the specified position.
         /// </summary>
@@ -643,9 +708,76 @@ namespace hjijijing.Tweening
             return from(startPosition);
         }
 
+
+        #region Endvalue callback
+        public TweeningAnimation move(GameObject gameObject, Func<Vector3> targetPosition, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            move(gameObject, Vector3.zero, duration, startDelay, endDelay);
+            return to(targetPosition);
+        }
+
+        public TweeningAnimation move(Func<Vector3> targetPosition, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+           return move(gameObject, targetPosition, duration, startDelay, endDelay);
+        }
+
+
+        public TweeningAnimation move(GameObject gameObject, Vector3 startPosition, Func<Vector3> targetPosition, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            move(gameObject, targetPosition, duration, startDelay, endDelay);
+            return from(startPosition);
+        }
+
+        public TweeningAnimation move(Vector3 startPosition, Func<Vector3> targetPosition, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return move(gameObject, startPosition, targetPosition, duration, startDelay, endDelay);
+        }
+        #endregion
+
+        #region Start value callbacks
+        public TweeningAnimation move(GameObject gameObject, Func<Vector3> startPosition, Vector3 targetPosition, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            move(gameObject, targetPosition, duration, startDelay, endDelay);
+            return from(startPosition);
+        }
+
+        public TweeningAnimation move(Func<Vector3> startPosition, Vector3 targetPosition, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return move(gameObject, startPosition, targetPosition, duration, startDelay, endDelay);
+        }
+        #endregion
+
+        #region Start and end callback
+        public TweeningAnimation move(GameObject gameObject, Func<Vector3> startPosition, Func<Vector3> targetPosition, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            move(gameObject, targetPosition, duration, startDelay, endDelay);
+            return from(startPosition);
+        }
+
+        public TweeningAnimation move(Func<Vector3> startPosition, Func<Vector3> targetPosition, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return move(gameObject, startPosition, targetPosition, duration, startDelay, endDelay);
+        }
+
+        #endregion
+
+
         #endregion
 
         #region Mesh Color
+
+        public TweeningAnimation colorMesh(float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return colorMesh(gameObject, duration, startDelay, endDelay);
+        }
+
+        public TweeningAnimation colorMesh(GameObject gameObject, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return colorMesh(gameObject, Color.black, duration, startDelay, endDelay);
+        }
+
+
+
         /// <summary>
         /// Adds a color change action that changes the animation's gameobject to the specified color.
         /// </summary>
@@ -706,9 +838,73 @@ namespace hjijijing.Tweening
             return from(startColor);
         }
 
+
+        #region Endvalue callback
+        public TweeningAnimation colorMesh(GameObject gameObject, Func<Color> targetColor, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            colorMesh(gameObject, Color.black, duration, startDelay, endDelay);
+            return to(targetColor);
+        }
+
+        public TweeningAnimation colorMesh(Func<Color> targetColor, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return colorMesh(gameObject, targetColor, duration, startDelay, endDelay);
+        }
+
+
+        public TweeningAnimation colorMesh(GameObject gameObject, Color startColor, Func<Color> targetColor, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            colorMesh(gameObject, targetColor, duration, startDelay, endDelay);
+            return from(startColor);
+        }
+
+        public TweeningAnimation colorMesh(Color startColor, Func<Color> targetColor, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return colorMesh(gameObject, startColor, targetColor, duration, startDelay, endDelay);
+        }
+        #endregion
+
+        #region Start value callbacks
+        public TweeningAnimation colorMesh(GameObject gameObject, Func<Color> startColor, Color targetColor, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            colorMesh(gameObject, targetColor, duration, startDelay, endDelay);
+            return from(startColor);
+        }
+
+        public TweeningAnimation colorMesh(Func<Color> startColor, Color targetColor, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return colorMesh(gameObject, startColor, targetColor, duration, startDelay, endDelay);
+        }
+        #endregion
+
+        #region Start and end callback
+        public TweeningAnimation colorMesh(GameObject gameObject, Func<Color> startColor, Func<Color> targetColor, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            colorMesh(gameObject, targetColor, duration, startDelay, endDelay);
+            return from(startColor);
+        }
+
+        public TweeningAnimation colorMesh(Func<Color> startColor, Func<Color> targetColor, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return colorMesh(gameObject, startColor, targetColor, duration, startDelay, endDelay);
+        }
+
+        #endregion
+
         #endregion
 
         #region Sprite color
+
+        public TweeningAnimation colorSprite(float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return colorSprite(gameObject, duration, startDelay, endDelay);
+        }
+
+        public TweeningAnimation colorSprite(GameObject gameObject, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return colorSprite(gameObject, Color.black, duration, startDelay, endDelay);
+        }
+
 
         /// <summary>
         /// Adds a color change action that changes the animation's gameobject to the specified color.
@@ -770,10 +966,81 @@ namespace hjijijing.Tweening
             return from(startColor);
         }
 
+
+
+        #region Endvalue callback
+        public TweeningAnimation colorSprite(GameObject gameObject, Func<Color> targetColor, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            colorSprite(gameObject, Color.black, duration, startDelay, endDelay);
+            return to(targetColor);
+        }
+
+        public TweeningAnimation colorSprite(Func<Color> targetColor, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return colorSprite(gameObject, targetColor, duration, startDelay, endDelay);
+        }
+
+
+        public TweeningAnimation colorSprite(GameObject gameObject, Color startColor, Func<Color> targetColor, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            colorSprite(gameObject, targetColor, duration, startDelay, endDelay);
+            return from(startColor);
+        }
+
+        public TweeningAnimation colorSprite(Color startColor, Func<Color> targetColor, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return colorSprite(gameObject, startColor, targetColor, duration, startDelay, endDelay);
+        }
+        #endregion
+
+        #region Start value callbacks
+        public TweeningAnimation colorSprite(GameObject gameObject, Func<Color> startColor, Color targetColor, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            colorSprite(gameObject, targetColor, duration, startDelay, endDelay);
+            return from(startColor);
+        }
+
+        public TweeningAnimation colorSprite(Func<Color> startColor, Color targetColor, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return colorSprite(gameObject, startColor, targetColor, duration, startDelay, endDelay);
+        }
+        #endregion
+
+        #region Start and end callback
+        public TweeningAnimation colorSprite(GameObject gameObject, Func<Color> startColor, Func<Color> targetColor, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            colorSprite(gameObject, targetColor, duration, startDelay, endDelay);
+            return from(startColor);
+        }
+
+        public TweeningAnimation colorSprite(Func<Color> startColor, Func<Color> targetColor, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return colorSprite(gameObject, startColor, targetColor, duration, startDelay, endDelay);
+        }
+
+        #endregion
+
+
+
+
         #endregion
 
 
         #region Rotation
+
+
+        public TweeningAnimation rotate(float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return rotate(gameObject, duration, startDelay, endDelay);
+        }
+
+        public TweeningAnimation rotate(GameObject gameObject, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return rotate(gameObject, Quaternion.identity, duration, startDelay, endDelay);
+        }
+
+
+
         /// <summary>
         /// Adds a rotation action that rotates the animation's gameobject to the specified rotation.
         /// </summary>
@@ -834,9 +1101,81 @@ namespace hjijijing.Tweening
             rotate(gameObject, targetRotation, duration, startDelay, endDelay);
             return from(startRotation);
         }
+
+        #region Endvalue callback
+        public TweeningAnimation rotate(GameObject gameObject, Func<Quaternion> targetRotation, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            rotate(gameObject, Quaternion.identity, duration, startDelay, endDelay);
+            return to(targetRotation);
+        }
+
+        public TweeningAnimation rotate(Func<Quaternion> targetRotation, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return rotate(gameObject, targetRotation, duration, startDelay, endDelay);
+        }
+
+
+        public TweeningAnimation rotate(GameObject gameObject, Quaternion startRotation, Func<Quaternion> targetRotation, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            rotate(gameObject, targetRotation, duration, startDelay, endDelay);
+            return from(startRotation);
+        }
+
+        public TweeningAnimation rotate(Quaternion startRotation, Func<Quaternion> targetRotation, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return rotate(gameObject, startRotation, targetRotation, duration, startDelay, endDelay);
+        }
+        #endregion
+
+        #region Start value callbacks
+        public TweeningAnimation rotate(GameObject gameObject, Func<Quaternion> startRotation, Quaternion targetRotation, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            rotate(gameObject, targetRotation, duration, startDelay, endDelay);
+            return from(startRotation);
+        }
+
+        public TweeningAnimation rotate(Func<Quaternion> startRotation, Quaternion targetRotation, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return rotate(gameObject, startRotation, targetRotation, duration, startDelay, endDelay);
+        }
+        #endregion
+
+        #region Start and end callback
+        public TweeningAnimation rotate(GameObject gameObject, Func<Quaternion> startRotation, Func<Quaternion> targetRotation, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            rotate(gameObject, targetRotation, duration, startDelay, endDelay);
+            return from(startRotation);
+        }
+
+        public TweeningAnimation rotate(Func<Quaternion> startRotation, Func<Quaternion> targetRotation, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return rotate(gameObject, startRotation, targetRotation, duration, startDelay, endDelay);
+        }
+
+        #endregion
+
+
+
+
+
+
+
         #endregion
 
         #region Scaling
+
+
+        public TweeningAnimation scale(float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return scale(gameObject, duration, startDelay, endDelay);
+        }
+
+        public TweeningAnimation scale(GameObject gameObject, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return scale(gameObject, Vector3.zero, duration, startDelay, endDelay);
+        }
+
+
         /// <summary>
         /// Adds a scale action that scales the animation's gameobject to the specified scale.
         /// </summary>
@@ -902,6 +1241,64 @@ namespace hjijijing.Tweening
             scale(gameObject, targetScale, duration, startDelay, endDelay);
             return from(startScale);
         }
+
+
+
+
+        #region Endvalue callback
+        public TweeningAnimation scale(GameObject gameObject, Func<Vector3> targetScale, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            scale(gameObject, Vector3.zero, duration, startDelay, endDelay);
+            return to(targetScale);
+        }
+
+        public TweeningAnimation scale(Func<Vector3> targetScale, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return scale(gameObject, targetScale, duration, startDelay, endDelay);
+        }
+
+
+        public TweeningAnimation scale(GameObject gameObject, Vector3 startScale, Func<Vector3> targetScale, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            scale(gameObject, targetScale, duration, startDelay, endDelay);
+            return from(startScale);
+        }
+
+        public TweeningAnimation scale(Vector3 startScale, Func<Vector3> targetScale, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return scale(gameObject, startScale, targetScale, duration, startDelay, endDelay);
+        }
+        #endregion
+
+        #region Start value callbacks
+        public TweeningAnimation scale(GameObject gameObject, Func<Vector3> startScale, Vector3 targetScale, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            scale(gameObject, targetScale, duration, startDelay, endDelay);
+            return from(startScale);
+        }
+
+        public TweeningAnimation scale(Func<Vector3> startScale, Vector3 targetScale, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return scale(gameObject, startScale, targetScale, duration, startDelay, endDelay);
+        }
+        #endregion
+
+        #region Start and end callback
+        public TweeningAnimation scale(GameObject gameObject, Func<Vector3> startScale, Func<Vector3> targetScale, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            scale(gameObject, targetScale, duration, startDelay, endDelay);
+            return from(startScale);
+        }
+
+        public TweeningAnimation scale(Func<Vector3> startScale, Func<Vector3> targetScale, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return scale(gameObject, startScale, targetScale, duration, startDelay, endDelay);
+        }
+
+        #endregion
+
+
+
 
         #endregion
 
@@ -1148,6 +1545,24 @@ namespace hjijijing.Tweening
             Start();
         }
 
+        /// <summary>
+        /// Repeats the sequence a number of times after it has been played. Beware: Passing 2 will play the animation a total of 3 times, one for the original playback and then two repititions.
+        /// </summary>
+        /// <param name="times">The amount of times to repeat the sequence</param>
+        public void Repeat(uint times)
+        {
+            uint timesLeft = times;
+            then();
+            call(()=> 
+            {
+                if (timesLeft == 0)
+                    return;
+                timesLeft--;
+                SetQueueNumber(-1);
+            });
+            Start();
+        }
+
         protected Action SetQueueNumberAction(int number)
         {
             return () => { SetQueueNumber(number); };
@@ -1309,6 +1724,23 @@ namespace hjijijing.Tweening
         #endregion
 
 
+
+
+
+        /// <summary>
+        /// Returns an animation that calls the callback with angle values from 0 to 2 PI over the given period
+        /// </summary>
+        /// <param name="mono">A monobehaviour, to start the animation</param>
+        /// <param name="period">The period for the oscillation</param>
+        /// <param name="callback">The callback to pass the angle to.</param>
+        /// <returns>The animation</returns>
+        public static TweeningAnimation Oscillate(MonoBehaviour mono, float period, Action<float> callback)
+        {
+            TweeningAnimation animation = new TweeningAnimation(mono);
+            animation.
+                floatCallback(0, Mathf.PI * 2, callback, period);
+            return animation;
+        }
     }
 
 }
