@@ -366,7 +366,7 @@ namespace hjijijing.Tweening
         public TweeningAnimation to<T>(T value)
         {
             if (!TryGetLatestAddedActionAsAnimationTweeningAction<T>(out var action)) return this;
-            action.startValue = value;
+            action.endValue = value;
             return this;
         }
 
@@ -482,7 +482,7 @@ namespace hjijijing.Tweening
         {
             AnimationTweeningAction latest = GetLatestAddedActionAsAnimationTweeningAction();
             action = latest;
-            return latest == null;
+            return latest != null;
         }
 
         public AnimationTweeningAction<T> GetLatestAddedActionAsAnimationTweeningAction<T>()
@@ -497,7 +497,7 @@ namespace hjijijing.Tweening
         {
             AnimationTweeningAction<T> latest = GetLatestAddedActionAsAnimationTweeningAction<T>();
             action = latest;
-            return latest == null;
+            return latest != null;
         }
 
         public TweeningAnimation ForceOne(bool force = true)
