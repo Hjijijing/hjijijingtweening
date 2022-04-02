@@ -567,14 +567,43 @@ namespace hjijijing.Tweening
         #endregion
 
 
-        public TweeningAnimation StartValueCallback<T>(Func<T> callback, out Action c)
+        public TweeningAnimation StartValueCallback<T>(Func<T> callback)
         {
-            CallOnActionStart((action) => {
+            return StartValueCallback(callback, out Action c);
+        }
+
+        public TweeningAnimation StartValueCallback<T>(Func<T> callback, out Action cleanup)
+        {
+            Action<AnimationTweeningAction> function = (action) =>
+            {
                 if (!TryGetAnimationTweeningAction<T>(action, out var animAction)) return;
                 animAction.SetStartValue(callback());
-            }, out Action cleanup);
+            };
 
-            c = cleanup;
+            CallOnActionStart(function, out Action c);
+
+            cleanup = c;
+            return this;
+        }
+
+
+        public TweeningAnimation EndValueCallback<T>(Func<T> callback)
+        {
+            return EndValueCallback(callback, out Action c);
+        }
+
+        public TweeningAnimation EndValueCallback<T>(Func<T> callback, out Action cleanup)
+        {
+            Action<AnimationTweeningAction> function = (action) =>
+            {
+                if (!TryGetAnimationTweeningAction<T>(action, out var animAction)) return;
+                animAction.endValue = callback();
+            };
+
+            CallOnActionStart(function, out Action c1);
+            CallOnActionStopped(function, out Action c2);
+
+            cleanup = ()=> { c1(); c2(); };
             return this;
         }
 
@@ -642,6 +671,33 @@ namespace hjijijing.Tweening
             move(gameObject, targetPosition, duration, startDelay, endDelay);
             return from(startPosition);
         }
+
+
+        #region Endvalue callback
+        public TweeningAnimation move(GameObject gameObject, Func<Vector3> targetPosition, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            move(gameObject, Vector3.zero, duration, startDelay, endDelay);
+            return EndValueCallback(targetPosition);
+        }
+
+        public TweeningAnimation move(Func<Vector3> targetPosition, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+           return move(gameObject, targetPosition, duration, startDelay, endDelay);
+        }
+
+
+        public TweeningAnimation move(GameObject gameObject, Vector3 startPosition, Func<Vector3> targetPosition, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            move(gameObject, targetPosition, duration, startDelay, endDelay);
+            return from(startPosition);
+        }
+
+        public TweeningAnimation move(Vector3 startPosition, Func<Vector3> targetPosition, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return move(gameObject, startPosition, targetPosition, duration, startDelay, endDelay);
+        }
+        #endregion
+
 
         #endregion
 
