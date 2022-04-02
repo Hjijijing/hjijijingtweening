@@ -385,6 +385,20 @@ namespace hjijijing.Tweening
             return null;
         }
 
+
+        public TweeningAnimation ForceOne(bool force = true)
+        {
+            ITweeningAction a = GetLatestAddedAction();
+            if (!(a is ITweener)) return this;
+
+            ((ITweener)a).forceOneAtEnd = force;
+            return this;
+        }
+
+       
+
+
+
         #region Tweeners
 
         /// <summary>
