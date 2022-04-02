@@ -250,6 +250,17 @@ namespace hjijijing.Tweening
             return (t) => { return 1-easing(t); };
         }
 
+
+        public static Func<float, float> scaleEasing(Func<float, float> easing, float scale)
+        {
+            return (t) => { return scale * easing(t); };
+        }
+
+        public static Func<float, float> negativeEasing(Func<float, float> easing)
+        {
+            return scaleEasing(easing, -1);
+        }
+
         public static Func<float, float> combineEasings(Func<float, float> easing1, Func<float, float> easing2, float transitionPoint = 0.5f)
         {
             return (t) =>
@@ -259,6 +270,27 @@ namespace hjijijing.Tweening
                 else
                     return easing2((t - transitionPoint)/(1 - transitionPoint));
             };
+        }
+
+
+        public static Func<float, float> addEasings(Func<float, float> easing1, Func<float, float> easing2)
+        {
+            return (t) => { return easing1(t) + easing2(t); };
+        }
+
+        public static Func<float, float> subtractEasings(Func<float, float> easing1, Func<float, float> easing2)
+        {
+            return (t) => { return easing1(t) - easing2(t); };
+        }
+
+        public static Func<float, float> multiplyEasings(Func<float, float> easing1, Func<float, float> easing2)
+        {
+            return (t) => { return easing1(t) * easing2(t); };
+        }
+
+        public static Func<float, float> averageEasings(Func<float, float> easing1, Func<float, float> easing2)
+        {
+            return scaleEasing(addEasings(easing1, easing2), 0.5f);
         }
     }
 
