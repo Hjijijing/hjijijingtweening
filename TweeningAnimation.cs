@@ -385,6 +385,13 @@ namespace hjijijing.Tweening
             return null;
         }
 
+        public bool TryGetLatestAddedAction(out ITweeningAction action)
+        {
+            ITweeningAction latest = GetLatestAddedAction();
+            action = latest;
+            return latest == null;
+        }
+
         public AnimationTweeningAction GetLatestAddedActionAsAnimationTweeningAction()
         {
             ITweeningAction latest = GetLatestAddedAction();
@@ -393,6 +400,29 @@ namespace hjijijing.Tweening
             return null;
         }
 
+        
+
+        public bool TryGetLatestAddedActionAsAnimationTweeningAction(out AnimationTweeningAction action)
+        {
+            AnimationTweeningAction latest = GetLatestAddedActionAsAnimationTweeningAction();
+            action = latest;
+            return latest == null;
+        }
+
+        public AnimationTweeningAction<T> GetLatestAddedActionAsAnimationTweeningAction<T>()
+        {
+            ITweeningAction latest = GetLatestAddedAction();
+            if (latest is AnimationTweeningAction<T>) return (AnimationTweeningAction<T>)latest;
+
+            return null;
+        }
+
+        public bool TryGetLatestAddedActionAsAnimationTweeningAction<T>(out AnimationTweeningAction<T> action)
+        {
+            AnimationTweeningAction<T> latest = GetLatestAddedActionAsAnimationTweeningAction<T>();
+            action = latest;
+            return latest == null;
+        }
 
         public TweeningAnimation ForceOne(bool force = true)
         {
@@ -404,16 +434,34 @@ namespace hjijijing.Tweening
         }
 
 
+        public bool TryGetAnimationTweeningAction(ITweeningAction action, out AnimationTweeningAction result)
+        {
+            result = null;
+            if (!(action is AnimationTweeningAction)) return false;
+
+            result = (AnimationTweeningAction)action;
+            return true;
+        }
+
+        public bool TryGetAnimationTweeningAction<T>(ITweeningAction action, out AnimationTweeningAction<T> result)
+        {
+            result = null;
+            if (!(action is AnimationTweeningAction<T>)) return false;
+
+            result = (AnimationTweeningAction<T>)action;
+            return true;
+        }
+
         #region AnimationTweeningAction callbacks
-        public TweeningAnimation CallOnActionStart(Action callback, out Action cleanup)
+        public TweeningAnimation CallOnActionStart(Action<AnimationTweeningAction> callback, out Action cleanup)
         {
             cleanup = null;
             AnimationTweeningAction latest = GetLatestAddedActionAsAnimationTweeningAction();
             if (latest == null) return this;
 
-            void cb()
+            void cb(AnimationTweeningAction a)
             {
-                callback();
+                callback(a);
             }
 
             //Might not be the best implementation
@@ -423,15 +471,15 @@ namespace hjijijing.Tweening
             return this;
         }
 
-        public TweeningAnimation CallOnActionEnd(Action callback, out Action cleanup)
+        public TweeningAnimation CallOnActionEnd(Action<AnimationTweeningAction> callback, out Action cleanup)
         {
             cleanup = null;
             AnimationTweeningAction latest = GetLatestAddedActionAsAnimationTweeningAction();
             if (latest == null) return this;
 
-            void cb()
+            void cb(AnimationTweeningAction a)
             {
-                callback();
+                callback(a);
             }
 
             //Might not be the best implementation
@@ -441,15 +489,15 @@ namespace hjijijing.Tweening
             return this;
         }
 
-        public TweeningAnimation CallOnActionStopped(Action callback, out Action cleanup)
+        public TweeningAnimation CallOnActionStopped(Action<AnimationTweeningAction> callback, out Action cleanup)
         {
             cleanup = null;
             AnimationTweeningAction latest = GetLatestAddedActionAsAnimationTweeningAction();
             if (latest == null) return this;
 
-            void cb()
+            void cb(AnimationTweeningAction a)
             {
-                callback();
+                callback(a);
             }
 
             //Might not be the best implementation
@@ -459,15 +507,15 @@ namespace hjijijing.Tweening
             return this;
         }
 
-        public TweeningAnimation CallOnActionReverted(Action callback, out Action cleanup)
+        public TweeningAnimation CallOnActionReverted(Action<AnimationTweeningAction> callback, out Action cleanup)
         {
             cleanup = null;
             AnimationTweeningAction latest = GetLatestAddedActionAsAnimationTweeningAction();
             if (latest == null) return this;
 
-            void cb()
+            void cb(AnimationTweeningAction a)
             {
-                callback();
+                callback(a);
             }
 
             //Might not be the best implementation
@@ -477,15 +525,15 @@ namespace hjijijing.Tweening
             return this;
         }
 
-        public TweeningAnimation CallOnActionForceFinished(Action callback, out Action cleanup)
+        public TweeningAnimation CallOnActionForceFinished(Action<AnimationTweeningAction> callback, out Action cleanup)
         {
             cleanup = null;
             AnimationTweeningAction latest = GetLatestAddedActionAsAnimationTweeningAction();
             if (latest == null) return this;
 
-            void cb ()
+            void cb(AnimationTweeningAction a)
             {
-                callback();
+                callback(a);
             }
 
             //Might not be the best implementation
@@ -495,12 +543,25 @@ namespace hjijijing.Tweening
             return this;
         }
 
-#endregion
+        #endregion
 
+
+        public TweeningAnimation StartValueCallback<T>(Func<T> callback, out Action c)
+        {
+            CallOnActionStart((action) => {
+                if (!TryGetAnimationTweeningAction<T>(action, out var animAction)) return;
+                animAction.SetStartValue(callback());
+            }, out Action cleanup);
+
+            c = cleanup;
+            return this;
+        }
 
 
         #region Tweeners
 
+
+        #region Position
         /// <summary>
         /// Adds a movement action that moves the animation's gameobject to the specified position.
         /// </summary>
@@ -561,9 +622,9 @@ namespace hjijijing.Tweening
             return from(startPosition);
         }
 
-        
+        #endregion
 
-
+        #region Mesh Color
         /// <summary>
         /// Adds a color change action that changes the animation's gameobject to the specified color.
         /// </summary>
@@ -624,6 +685,74 @@ namespace hjijijing.Tweening
             return from(startColor);
         }
 
+        #endregion
+
+        #region Sprite color
+
+        /// <summary>
+        /// Adds a color change action that changes the animation's gameobject to the specified color.
+        /// </summary>
+        /// <param name="targetColor">The color to change to</param>
+        /// <param name="duration">Duration for the change</param>
+        /// <param name="startDelay">Delay before the change starts. Default is 0</param>
+        /// <param name="endDelay">Delay after the change is done, before it is marked as finished. Default is 0</param>
+        /// <returns></returns>
+        public TweeningAnimation colorSprite(Color targetColor, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return colorSprite(gameObject, targetColor, duration, startDelay, endDelay);
+        }
+
+        /// <summary>
+        /// Adds a color change action that changes the specified gameobject to the specified color.
+        /// </summary>
+        /// <param name="gameObject">The GameObject whose color will be changed</param>
+        /// <param name="targetColor">The color to change to</param>
+        /// <param name="duration">Duration for the change</param>
+        /// <param name="startDelay">Delay before the change starts. Default is 0</param>
+        /// <param name="endDelay">Delay after the change is done, before it is marked as finished. Default is 0</param>
+        /// <returns></returns>
+        public TweeningAnimation colorSprite(GameObject gameObject, Color targetColor, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            if (gameObject == null) return this;
+            SpriteColorTweener action = new SpriteColorTweener(builder.tweenDone, source, gameObject, targetColor, duration, startDelay, endDelay);
+
+            AddActionToBuilder(action);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a color change action that changes the animation's gameobject to the specified color.
+        /// </summary>
+        /// <param name="startColor">The color to change from</param>
+        /// <param name="targetColor">The color to change to</param>
+        /// <param name="duration">Duration for the change</param>
+        /// <param name="startDelay">Delay before the change starts. Default is 0</param>
+        /// <param name="endDelay">Delay after the change is done, before it is marked as finished. Default is 0</param>
+        public TweeningAnimation colorSprite(Color startColor, Color targetColor, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return (colorSprite(gameObject, startColor, targetColor, duration, startDelay, endDelay));
+        }
+
+        /// <summary>
+        /// Adds a color change action that changes the specified gameobject to the specified color from the specified start color.
+        /// </summary>
+        /// <param name="gameObject">The GameObject whose color will be changed</param>
+        /// <param name="startColor">The color to change from</param>
+        /// <param name="targetColor">The color to change to</param>
+        /// <param name="duration">Duration for the change</param>
+        /// <param name="startDelay">Delay before the change starts. Default is 0</param>
+        /// <param name="endDelay">Delay after the change is done, before it is marked as finished. Default is 0</param>
+        /// <returns></returns>
+        public TweeningAnimation colorSprite(GameObject gameObject, Color startColor, Color targetColor, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            colorSprite(gameObject, targetColor, duration, startDelay, endDelay);
+            return from(startColor);
+        }
+
+        #endregion
+
+
+        #region Rotation
         /// <summary>
         /// Adds a rotation action that rotates the animation's gameobject to the specified rotation.
         /// </summary>
@@ -684,14 +813,9 @@ namespace hjijijing.Tweening
             rotate(gameObject, targetRotation, duration, startDelay, endDelay);
             return from(startRotation);
         }
+        #endregion
 
-
-
-
-
-
-
-
+        #region Scaling
         /// <summary>
         /// Adds a scale action that scales the animation's gameobject to the specified scale.
         /// </summary>
@@ -758,11 +882,11 @@ namespace hjijijing.Tweening
             return from(startScale);
         }
 
+        #endregion
 
 
 
-
-
+        #region Callbacks
         /// <summary>
         /// Adds a vector3 callback animation that calls the given callback function every frame with the current value.
         /// </summary>
@@ -889,7 +1013,7 @@ namespace hjijijing.Tweening
             AddActionToBuilder(action);
             return this;
         }
-
+        #endregion
 
         /// <summary>
         /// Adds an tweening action the calls the given callback.

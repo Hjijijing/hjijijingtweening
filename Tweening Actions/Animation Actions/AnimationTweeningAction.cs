@@ -20,7 +20,7 @@ namespace hjijijing.Tweening
 
         protected Coroutine coroutine;
 
-        public delegate void AnimationTweeningEvent();
+        public delegate void AnimationTweeningEvent(AnimationTweeningAction action);
         public AnimationTweeningEvent onTweenStarted;
         public AnimationTweeningEvent onTweenEnded;
         public AnimationTweeningEvent onTweenStopped;
@@ -48,21 +48,21 @@ namespace hjijijing.Tweening
         {
             if (coroutine == null) return;
             mono.StopCoroutine(coroutine);
-            onTweenStopped?.Invoke();
+            onTweenStopped?.Invoke(this);
         }
 
         public void forceFinish()
         {
             Stop();
             modifyGameObject(1f);
-            onTweenForceFinished?.Invoke();
+            onTweenForceFinished?.Invoke(this);
         }
 
         public void revert()
         {
             Stop();
             modifyGameObject(0f);
-            onTweenReverted?.Invoke();
+            onTweenReverted?.Invoke(this);
         }
 
 
@@ -112,7 +112,7 @@ namespace hjijijing.Tweening
             if(!startDetermined)
             findStartValue();
 
-            onTweenStarted?.Invoke();
+            onTweenStarted?.Invoke(this);
             modifyGameObject(0f);
 
             yield return null;
@@ -125,7 +125,7 @@ namespace hjijijing.Tweening
 
 
             modifyGameObject(forceOneAtEnd ? 1f : easing(1f));
-            onTweenEnded?.Invoke();
+            onTweenEnded?.Invoke(this);
 
             if (endDelay > 0f)
                 yield return new WaitForSeconds(endDelay);
