@@ -385,6 +385,14 @@ namespace hjijijing.Tweening
             return null;
         }
 
+        public AnimationTweeningAction GetLatestAddedActionAsAnimationTweeningAction()
+        {
+            ITweeningAction latest = GetLatestAddedAction();
+            if (latest is AnimationTweeningAction) return (AnimationTweeningAction)latest;
+
+            return null;
+        }
+
 
         public TweeningAnimation ForceOne(bool force = true)
         {
@@ -395,7 +403,99 @@ namespace hjijijing.Tweening
             return this;
         }
 
-       
+
+        #region AnimationTweeningAction callbacks
+        public TweeningAnimation CallOnActionStart(Action callback, out Action cleanup)
+        {
+            cleanup = null;
+            AnimationTweeningAction latest = GetLatestAddedActionAsAnimationTweeningAction();
+            if (latest == null) return this;
+
+            void cb()
+            {
+                callback();
+            }
+
+            //Might not be the best implementation
+            latest.onTweenStarted += cb;
+
+            cleanup = () => { latest.onTweenStarted += cb; };
+            return this;
+        }
+
+        public TweeningAnimation CallOnActionEnd(Action callback, out Action cleanup)
+        {
+            cleanup = null;
+            AnimationTweeningAction latest = GetLatestAddedActionAsAnimationTweeningAction();
+            if (latest == null) return this;
+
+            void cb()
+            {
+                callback();
+            }
+
+            //Might not be the best implementation
+            latest.onTweenEnded += cb;
+
+            cleanup = () => { latest.onTweenEnded += cb; };
+            return this;
+        }
+
+        public TweeningAnimation CallOnActionStopped(Action callback, out Action cleanup)
+        {
+            cleanup = null;
+            AnimationTweeningAction latest = GetLatestAddedActionAsAnimationTweeningAction();
+            if (latest == null) return this;
+
+            void cb()
+            {
+                callback();
+            }
+
+            //Might not be the best implementation
+            latest.onTweenStopped += cb;
+
+            cleanup = () => { latest.onTweenStopped += cb; };
+            return this;
+        }
+
+        public TweeningAnimation CallOnActionReverted(Action callback, out Action cleanup)
+        {
+            cleanup = null;
+            AnimationTweeningAction latest = GetLatestAddedActionAsAnimationTweeningAction();
+            if (latest == null) return this;
+
+            void cb()
+            {
+                callback();
+            }
+
+            //Might not be the best implementation
+            latest.onTweenReverted += cb;
+
+            cleanup = () => { latest.onTweenReverted += cb; };
+            return this;
+        }
+
+        public TweeningAnimation CallOnActionForceFinished(Action callback, out Action cleanup)
+        {
+            cleanup = null;
+            AnimationTweeningAction latest = GetLatestAddedActionAsAnimationTweeningAction();
+            if (latest == null) return this;
+
+            void cb ()
+            {
+                callback();
+            }
+
+            //Might not be the best implementation
+            latest.onTweenForceFinished += cb;
+
+            cleanup = () => { latest.onTweenForceFinished += cb; };
+            return this;
+        }
+
+#endregion
 
 
 

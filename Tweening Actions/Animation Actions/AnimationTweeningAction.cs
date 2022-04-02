@@ -103,9 +103,6 @@ namespace hjijijing.Tweening
             startDetermined = true;
         }
 
-
-        
-
         public override IEnumerator execute(Action<ITweener> onDone)
         {
             timeSinceStart = 0f;
