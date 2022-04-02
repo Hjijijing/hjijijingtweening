@@ -14,6 +14,8 @@ namespace hjijijing.Tweening
         public AnimationDelegate onRevert;
         public AnimationDelegate onStart;
         public AnimationDelegate onStop;
+        public AnimationDelegate onForceFinish;
+        public AnimationDelegate onEnded;
         
 
         /// <summary>
@@ -128,7 +130,9 @@ namespace hjijijing.Tweening
             if(currentPlayingSequence != null)
                 currentPlayingSequence.onTweenSequenceDone -= StartNextQueue;
 
-            if (queueNumber >= actionQueues.Count) return;
+            if (queueNumber >= actionQueues.Count) {
+                onEnded?.Invoke();
+                return; }
 
             TweeningSequence sequence = actionQueues[queueNumber];
             currentPlayingSequence = sequence;
@@ -166,6 +170,8 @@ namespace hjijijing.Tweening
 
                 sequence.ForceFinish();
             }
+
+            onForceFinish?.Invoke();
         }
 
         /// <summary>
@@ -1718,6 +1724,23 @@ namespace hjijijing.Tweening
         #endregion
 
 
+
+
+
+        /// <summary>
+        /// Returns an animation that calls the callback with angle values from 0 to 2 PI over the given period
+        /// </summary>
+        /// <param name="mono">A monobehaviour, to start the animation</param>
+        /// <param name="period">The period for the oscillation</param>
+        /// <param name="callback">The callback to pass the angle to.</param>
+        /// <returns>The animation</returns>
+        public static TweeningAnimation Oscillate(MonoBehaviour mono, float period, Action<float> callback)
+        {
+            TweeningAnimation animation = new TweeningAnimation(mono);
+            animation.
+                floatCallback(0, Mathf.PI * 2, callback, period);
+            return animation;
+        }
     }
 
 }
