@@ -1539,6 +1539,24 @@ namespace hjijijing.Tweening
             Start();
         }
 
+        /// <summary>
+        /// Repeats the sequence a number of times after it has been played. Beware: Passing 2 will play the animation a total of 3 times, one for the original playback and then two repititions.
+        /// </summary>
+        /// <param name="times">The amount of times to repeat the sequence</param>
+        public void Repeat(uint times)
+        {
+            uint timesLeft = times;
+            then();
+            call(()=> 
+            {
+                if (timesLeft == 0)
+                    return;
+                timesLeft--;
+                SetQueueNumber(-1);
+            });
+            Start();
+        }
+
         protected Action SetQueueNumberAction(int number)
         {
             return () => { SetQueueNumber(number); };
