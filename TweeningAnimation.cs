@@ -764,6 +764,140 @@ namespace hjijijing.Tweening
 
         #endregion
 
+
+        #region Anchor position
+
+        public TweeningAnimation anchorMove(float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return anchorMove(gameObject, duration, startDelay, endDelay);
+        }
+
+        public TweeningAnimation anchorMove(GameObject gameObject, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return anchorMove(gameObject, Vector3.zero, duration, startDelay, endDelay);
+        }
+
+
+
+
+        /// <summary>
+        /// Adds a anchorMovement action that anchorMoves the animation's gameobject to the specified position.
+        /// </summary>
+        /// <param name="targetPosition">The position to anchorMove to</param>
+        /// <param name="duration">Duration for the anchorMovement</param>
+        /// <param name="startDelay">Delay before the anchorMovement starts. Default is 0</param>
+        /// <param name="endDelay">Delay after the anchorMovement is done, before it is marked as finished. Default is 0</param>
+        /// <returns></returns>
+        public TweeningAnimation anchorMove(Vector3 targetPosition, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return anchorMove(gameObject, targetPosition, duration, startDelay, endDelay);
+        }
+
+        /// <summary>
+        /// Adds a anchorMovement action that anchorMoves the specified gameobject to the specified position.
+        /// </summary>
+        /// <param name="gameObject">The GameObject to anchorMove</param>
+        /// <param name="targetPosition">The position to anchorMove to</param>
+        /// <param name="duration">Duration for the anchorMovement</param>
+        /// <param name="startDelay">Delay before the anchorMovement starts. Default is 0</param>
+        /// <param name="endDelay">Delay after the anchorMovement is done, before it is marked as finished. Default is 0</param>
+        /// <returns></returns>
+        public TweeningAnimation anchorMove(GameObject gameObject, Vector3 targetPosition, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            if (gameObject == null) return this;
+            AnchoredPositionTweener action = new AnchoredPositionTweener(builder.tweenDone, source, gameObject, targetPosition, duration, startDelay, endDelay);
+
+            AddActionToBuilder(action);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a anchorMovement action that anchorMoves the animation's gameobject to the specified end position from the speicifed start poistion.
+        /// </summary>
+        /// <param name="startPosition">The start position</param>
+        /// <param name="targetPosition">The position to anchorMove to</param>
+        /// <param name="duration">Duration for the anchorMovement</param>
+        /// <param name="startDelay">Delay before the anchorMovement starts. Default is 0</param>
+        /// <param name="endDelay">Delay after the anchorMovement is done, before it is marked as finished. Default is 0</param>
+        public TweeningAnimation anchorMove(Vector3 startPosition, Vector3 targetPosition, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return anchorMove(gameObject, startPosition, targetPosition, duration, startDelay, endDelay);
+        }
+
+
+        /// <summary>
+        /// Adds a anchorMovement action that anchorMoves the specified gameobject from the specified start poisition to the specified end position.
+        /// </summary>
+        /// <param name="gameObject">The GameObject to anchorMove</param>
+        /// <param name="startPosition">The start position</param>
+        /// <param name="targetPosition">The position to anchorMove to</param>
+        /// <param name="duration">Duration for the anchorMovement</param>
+        /// <param name="startDelay">Delay before the anchorMovement starts. Default is 0</param>
+        /// <param name="endDelay">Delay after the anchorMovement is done, before it is marked as finished. Default is 0</param>
+        public TweeningAnimation anchorMove(GameObject gameObject, Vector3 startPosition, Vector3 targetPosition, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            anchorMove(gameObject, targetPosition, duration, startDelay, endDelay);
+            return from(startPosition);
+        }
+
+
+        #region Endvalue callback
+        public TweeningAnimation anchorMove(GameObject gameObject, Func<Vector3> targetPosition, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            anchorMove(gameObject, Vector3.zero, duration, startDelay, endDelay);
+            return to(targetPosition);
+        }
+
+        public TweeningAnimation anchorMove(Func<Vector3> targetPosition, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return anchorMove(gameObject, targetPosition, duration, startDelay, endDelay);
+        }
+
+
+        public TweeningAnimation anchorMove(GameObject gameObject, Vector3 startPosition, Func<Vector3> targetPosition, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            anchorMove(gameObject, targetPosition, duration, startDelay, endDelay);
+            return from(startPosition);
+        }
+
+        public TweeningAnimation anchorMove(Vector3 startPosition, Func<Vector3> targetPosition, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return anchorMove(gameObject, startPosition, targetPosition, duration, startDelay, endDelay);
+        }
+        #endregion
+
+        #region Start value callbacks
+        public TweeningAnimation anchorMove(GameObject gameObject, Func<Vector3> startPosition, Vector3 targetPosition, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            anchorMove(gameObject, targetPosition, duration, startDelay, endDelay);
+            return from(startPosition);
+        }
+
+        public TweeningAnimation anchorMove(Func<Vector3> startPosition, Vector3 targetPosition, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return anchorMove(gameObject, startPosition, targetPosition, duration, startDelay, endDelay);
+        }
+        #endregion
+
+        #region Start and end callback
+        public TweeningAnimation anchorMove(GameObject gameObject, Func<Vector3> startPosition, Func<Vector3> targetPosition, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            anchorMove(gameObject, targetPosition, duration, startDelay, endDelay);
+            return from(startPosition);
+        }
+
+        public TweeningAnimation anchorMove(Func<Vector3> startPosition, Func<Vector3> targetPosition, float duration, float startDelay = 0f, float endDelay = 0f)
+        {
+            return anchorMove(gameObject, startPosition, targetPosition, duration, startDelay, endDelay);
+        }
+
+
+
+
+        #endregion
+        #endregion
+
+
         #region Mesh Color
 
         public TweeningAnimation colorMesh(float duration, float startDelay = 0f, float endDelay = 0f)
@@ -1204,7 +1338,7 @@ namespace hjijijing.Tweening
             ScaleTweener action = new ScaleTweener(builder.tweenDone, source, gameObject, targetScale, duration, startDelay, endDelay);
 
 
-
+            
             AddActionToBuilder(action);
             return this;
         }
