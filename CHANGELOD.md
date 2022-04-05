@@ -1,3 +1,9 @@
+# 1.0.13 - 05-04-2022
+
+### Added:
+
+- anchorMove() for animating a rect transforms anchored position. This will make it easier to move ui elements.
+
 # 1.0.12 - 02-04-2022
 
 ### Added:
