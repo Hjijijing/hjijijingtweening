@@ -183,6 +183,7 @@ namespace hjijijing.Tweening
 
             for (int i = queueNumber; i > -1; i--)
             {
+                if (i >= actionQueues.Count) continue;
                 TweeningSequence sequence = actionQueues[i];
 
                 sequence.Revert();

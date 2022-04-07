@@ -54,7 +54,7 @@ namespace hjijijing.Tweening
         public void forceFinish()
         {
             Stop();
-            modifyGameObject(1f);
+            modifyGameObject(forceOneAtEnd ? 1f : easing(1f));
             onTweenForceFinished?.Invoke(this);
         }
 
