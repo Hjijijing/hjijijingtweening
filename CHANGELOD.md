@@ -1,3 +1,9 @@
+# 1.0.14 - 07-04-2022
+
+### Fixed:
+- Issue regarding revert() causing Out of bounds error
+- forceFinish() now respects the forceOne bool
+- Monobehaviour.Tween() now uses the monobehaviours gameobject, which was also supposed to be the case.
 # 1.0.13 - 05-04-2022
 
 ### Added:
