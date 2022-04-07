@@ -29,7 +29,7 @@ namespace hjijijing.Tweening
         /// <returns>The tweening animation</returns>
         public static TweeningAnimation Tween(this MonoBehaviour source, Func<float, float> easing)
         {
-            return new TweeningAnimation(source, easing);
+            return new TweeningAnimation(source, source.gameObject, easing);
         }
 
         /// <summary>
